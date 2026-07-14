@@ -260,7 +260,8 @@ img { max-width: 100%; display: block; }
 
 .solution { background: var(--paper); padding-bottom: 0; }
 .solutionGrid { align-items: start; }
-.solutionIntro { grid-column: 1 / 5; position: sticky; top: 120px; }
+.solutionBody { grid-column: 1 / 13; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: start; }
+.solutionIntro { grid-column: 1 / 5; position: sticky; top: 120px; align-self: start; }
 .solutionIntro .sectionLabel { margin-bottom: 64px; }
 .solutionIntro h2 { font-size: clamp(38px, 4.3vw, 64px); }
 .solutionIntro em { color: var(--coral); font-family: Georgia, serif; font-weight: 400; }
@@ -513,6 +514,7 @@ img { max-width: 100%; display: block; }
   .turnQuestion { grid-column: 5 / 9; }
   .solutionIntro { grid-column: 1 / 4; }
   .layerStack { grid-column: 4 / 9; }
+  .solutionBody { grid-column: 1 / 9; grid-template-columns: repeat(8, minmax(0, 1fr)); column-gap: 20px; }
   .solutionHandoff { grid-column: 2 / 8; }
   .demoIntro .sectionStatement { grid-column: 3 / 9; }
   .demoHandoff { grid-template-columns: repeat(8, minmax(0, 1fr)); column-gap: 20px; }
@@ -568,6 +570,7 @@ img { max-width: 100%; display: block; }
   .marsQuote { grid-column: 1 / 5; margin-top: 40px; }
   .turnQuestion { grid-column: 2 / 5; margin-top: 72px; }
   .solutionIntro { position: static; grid-column: 1 / 5; margin-bottom: 70px; }
+  .solutionBody { grid-column: 1 / 5; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 16px; }
   .solution { padding-bottom: 0; }
   .solutionIntro .sectionLabel { margin-bottom: 36px; }
   .layerStack { grid-column: 1 / 5; }

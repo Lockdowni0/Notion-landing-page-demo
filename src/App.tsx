@@ -177,17 +177,19 @@ function App() {
 
         <section className="solution section" aria-labelledby="solution-title">
           <div className="pageGrid solutionGrid">
-            <div className="solutionIntro">
-              <SectionLabel number="02">Solution</SectionLabel>
-              <h2 id="solution-title">A centralized home for your <em>information &amp; software.</em></h2>
-              <p>Start with a page. Give it structure. Shape it into a tool.</p>
-            </div>
-            <div className="layerStack">
-              {layers.map(([number, label, detail], index) => (
-                <motion.div className="layer" key={number} initial={reduceMotion ? false : { opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-10%' }} transition={{ delay: index * 0.08 }}>
-                  <span>{number}</span><strong>{label}</strong><p>{detail}</p>
-                </motion.div>
-              ))}
+            <div className="solutionBody">
+              <div className="solutionIntro">
+                <SectionLabel number="02">Solution</SectionLabel>
+                <h2 id="solution-title">A centralized home for your <em>information &amp; software.</em></h2>
+                <p>Start with a page. Give it structure. Shape it into a tool.</p>
+              </div>
+              <div className="layerStack">
+                {layers.map(([number, label, detail], index) => (
+                  <motion.div className="layer" key={number} initial={reduceMotion ? false : { opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-10%' }} transition={{ delay: index * 0.08 }}>
+                    <span>{number}</span><strong>{label}</strong><p>{detail}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
             <motion.div
               className="solutionHandoff"
