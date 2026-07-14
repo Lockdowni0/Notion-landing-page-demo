@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
-import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import {
   demoReducer,
   displayProjectName,
@@ -20,14 +20,6 @@ const layers = [
   ['2', 'Views', 'Recompose the same data.', ['Table', 'Board', 'Portal']],
   ['3', 'Behavior', 'Decide how work moves.', ['Filter', 'Permission', 'Workflow']],
   ['4', 'Publish', 'Save the composition as a recipe.', ['Template', 'Adapt', 'Reuse']],
-] as const
-
-const layerAssemblyRanges = [
-  [0.08, 0.24],
-  [0.22, 0.38],
-  [0.36, 0.52],
-  [0.50, 0.66],
-  [0.64, 0.80],
 ] as const
 
 const planes = [
@@ -76,38 +68,33 @@ function PersonGlyph() {
   return <span className="personGlyph" aria-hidden="true"><i /><b /></span>
 }
 
-function StructureLayer({ number, label, detail, tokens, reduceMotion, compositionProgress, assemblyRange }: { number: string; label: string; detail: string; tokens: readonly string[]; reduceMotion: boolean | null; compositionProgress: MotionValue<number>; assemblyRange: readonly [number, number] }) {
+function StructureLayer({ number, label, detail, tokens, reduceMotion }: { number: string; label: string; detail: string; tokens: readonly string[]; reduceMotion: boolean | null }) {
   const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 88%', 'end 24%'] })
-  const y = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 0 : 34, 0, reduceMotion ? 0 : -8])
-  const scale = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 1 : 0.965, 1, reduceMotion ? 1 : 0.985])
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [reduceMotion ? 1 : 0.32, 1, reduceMotion ? 1 : 0.78])
-  const [start, end] = assemblyRange
-  const interval = end - start
-  const tokenOneRawX = useTransform(compositionProgress, [start, end], [reduceMotion ? 0 : 250, 0])
-  const tokenTwoRawX = useTransform(compositionProgress, [start + interval * 0.16, end + interval * 0.08], [reduceMotion ? 0 : 315, 0])
-  const tokenThreeRawX = useTransform(compositionProgress, [start + interval * 0.32, end + interval * 0.16], [reduceMotion ? 0 : 380, 0])
-  const tokenOneX = useSpring(tokenOneRawX, { stiffness: 210, damping: 27, mass: 0.26 })
-  const tokenTwoX = useSpring(tokenTwoRawX, { stiffness: 210, damping: 27, mass: 0.26 })
-  const tokenThreeX = useSpring(tokenThreeRawX, { stiffness: 210, damping: 27, mass: 0.26 })
-  const tokenOneOpacity = useTransform(compositionProgress, [start, start + interval * 0.5], [reduceMotion ? 1 : 0, 1])
-  const tokenTwoOpacity = useTransform(compositionProgress, [start + interval * 0.16, start + interval * 0.66], [reduceMotion ? 1 : 0, 1])
-  const tokenThreeOpacity = useTransform(compositionProgress, [start + interval * 0.32, end], [reduceMotion ? 1 : 0, 1])
-  const borderLeftColor = useTransform(compositionProgress, [start, end], ['rgba(244,95,86,0)', 'rgba(244,95,86,1)'])
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 94%', 'start 60%'] })
+  const y = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 0 : 24, 0])
+  const scale = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 1 : 0.988, 1])
+  const opacity = useTransform(scrollYProgress, [0, 0.28], [reduceMotion ? 1 : 0.54, 1])
+  const tokenOneRawX = useTransform(scrollYProgress, [0.02, 0.46], [reduceMotion ? 0 : 240, 0])
+  const tokenTwoRawX = useTransform(scrollYProgress, [0.10, 0.56], [reduceMotion ? 0 : 320, 0])
+  const tokenThreeRawX = useTransform(scrollYProgress, [0.18, 0.66], [reduceMotion ? 0 : 400, 0])
+  const tokenOneOpacity = useTransform(scrollYProgress, [0.02, 0.32], [reduceMotion ? 1 : 0, 1])
+  const tokenTwoOpacity = useTransform(scrollYProgress, [0.10, 0.42], [reduceMotion ? 1 : 0, 1])
+  const tokenThreeOpacity = useTransform(scrollYProgress, [0.18, 0.52], [reduceMotion ? 1 : 0, 1])
   const tokenMotion = [
-    { x: tokenOneX, opacity: tokenOneOpacity },
-    { x: tokenTwoX, opacity: tokenTwoOpacity },
-    { x: tokenThreeX, opacity: tokenThreeOpacity },
+    { x: tokenOneRawX, opacity: tokenOneOpacity },
+    { x: tokenTwoRawX, opacity: tokenTwoOpacity },
+    { x: tokenThreeRawX, opacity: tokenThreeOpacity },
   ]
 
   return (
-    <motion.div ref={ref} className="layer" data-layer={label.toLowerCase()} style={{ y, scale, opacity, borderLeftColor }}>
-      <span>{number}</span><strong>{label}</strong>
-      <div className="layerComposition">
+    <motion.div ref={ref} className="layer" data-layer={label.toLowerCase()} style={{ y, scale, opacity }}>
+      <div className="layerLead">
+        <span>{number}</span>
+        <strong>{label}</strong>
         <p>{detail}</p>
-        <div className="layerTokens" aria-label={`${label} primitives`}>
-          {tokens.map((token, index) => <motion.i key={token} style={tokenMotion[index]}>{token}</motion.i>)}
-        </div>
+      </div>
+      <div className="layerModules" aria-label={`${label} primitives`}>
+        {tokens.map((token, index) => <motion.i key={token} style={tokenMotion[index]}>{token}</motion.i>)}
       </div>
     </motion.div>
   )
@@ -271,8 +258,8 @@ function App() {
                 <p>Start with information. Add structure, views, and behavior. Keep composing until the page becomes the tool.</p>
               </div>
               <div className="layerStack">
-                {layers.map(([number, label, detail, tokens], index) => (
-                  <StructureLayer key={number} number={number} label={label} detail={detail} tokens={tokens} reduceMotion={reduceMotion} compositionProgress={solutionProgress} assemblyRange={layerAssemblyRanges[index]} />
+                {layers.map(([number, label, detail, tokens]) => (
+                  <StructureLayer key={number} number={number} label={label} detail={detail} tokens={tokens} reduceMotion={reduceMotion} />
                 ))}
               </div>
             </div>

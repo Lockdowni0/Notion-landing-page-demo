@@ -204,7 +204,7 @@ img { max-width: 100%; display: block; }
   align-items: baseline;
   gap: 14px;
   color: var(--ink);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -291,45 +291,51 @@ img { max-width: 100%; display: block; }
 .layer {
   position: relative;
   z-index: 1;
-  min-height: 160px;
+  min-height: 176px;
   display: grid;
-  grid-template-columns: 54px minmax(150px, .85fr) minmax(260px, 1.25fr);
-  align-items: center;
-  gap: 22px;
-  padding: 26px 28px;
+  grid-template-columns: minmax(280px, 1.08fr) minmax(300px, .92fr);
+  gap: 4px;
   overflow: hidden;
-  background: var(--coral-pale);
   color: var(--coral);
-  border-left: 2px solid transparent;
-  transition: background .2s ease, border-color .2s ease;
+  transform-origin: center left;
 }
-.layer:hover { background: #ffe9e5; border-left-color: var(--coral); }
-.layer:first-child { background: #f2f2ef; color: var(--mist); }
-.layer > span { font-size: 34px; font-weight: 300; }
-.layer strong { font-size: clamp(22px, 2.5vw, 34px); font-weight: 400; }
-.layer p { margin: 0; font-size: 14px; line-height: 1.4; }
-.layerComposition { align-self: stretch; display: grid; grid-template-rows: auto 1fr; gap: 14px; align-content: stretch; }
-.layerComposition p { align-self: start; font-size: 14px; }
-.layerTokens { width: 100%; min-height: 58px; align-self: end; display: flex; gap: 3px; padding-top: 8px; }
-.layerTokens i {
+.layerLead {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  column-gap: 22px;
+  padding: 28px;
+  border-left: 2px solid var(--coral);
+  background: var(--coral-pale);
+  transition: background .2s ease;
+}
+.layer:hover .layerLead, .layer:hover .layerModules i { background: #ffe9e5; }
+.layer[data-layer="content"] { color: var(--mist); }
+.layer[data-layer="content"] .layerLead, .layer[data-layer="content"] .layerModules i { background: #f2f2ef; }
+.layerLead > span { font-size: 34px; font-weight: 300; }
+.layerLead strong { font-size: clamp(22px, 2.5vw, 34px); font-weight: 400; }
+.layerLead p { grid-column: 2; margin: 0; font-size: 14px; line-height: 1.4; }
+.layerModules { min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+.layerModules i {
   position: relative;
-  flex: 1;
   min-width: 0;
   display: grid;
   place-items: center;
-  padding: 14px 8px 12px;
-  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
-  background: color-mix(in srgb, var(--white) 48%, transparent);
-  font-size: 10px;
+  padding: 24px 10px;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: var(--coral-pale);
+  font-size: 11px;
   font-style: normal;
-  letter-spacing: .02em;
+  letter-spacing: .04em;
   text-align: center;
-  transform-origin: center;
+  transform-origin: center right;
+  transition: background .2s ease;
 }
-.layerTokens i::before { content: ""; position: absolute; top: -7px; left: calc(50% - 8px); width: 16px; height: 7px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-bottom: 0; background: var(--coral-pale); }
-.layer:first-child .layerTokens i::before { background: #f2f2ef; }
-.layerTokens i:not(:last-child)::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 4px); right: -6px; width: 8px; height: 8px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 50%; background: var(--coral-pale); }
-.layer:first-child .layerTokens i:not(:last-child)::after { background: #f2f2ef; }
+.layerModules i::before { content: ""; position: absolute; top: 0; left: calc(50% - 17px); width: 34px; height: 9px; border-inline: 1px solid color-mix(in srgb, currentColor 30%, transparent); background: color-mix(in srgb, var(--white) 24%, transparent); }
+.layerModules i:not(:last-child)::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 7px); right: -8px; width: 14px; height: 14px; border: 1px solid color-mix(in srgb, currentColor 34%, transparent); border-radius: 50%; background: inherit; }
 .solutionHandoff {
   grid-column: 3 / 11;
   position: relative;
@@ -598,6 +604,10 @@ img { max-width: 100%; display: block; }
   .turnQuestion { grid-column: 5 / 9; }
   .solutionIntro { grid-column: 1 / 4; }
   .layerStack { grid-column: 4 / 9; }
+  .layer { grid-template-columns: minmax(190px, 1.05fr) minmax(190px, .95fr); }
+  .layerLead { grid-template-columns: 44px minmax(0, 1fr); column-gap: 16px; padding: 24px 20px; }
+  .layerLead > span { font-size: 30px; }
+  .layerLead strong { font-size: clamp(21px, 2.6vw, 30px); }
   .solutionBody { grid-column: 1 / 9; grid-template-columns: repeat(8, minmax(0, 1fr)); column-gap: 20px; }
   .solutionHandoff { grid-column: 2 / 8; }
   .demoIntro .sectionStatement { grid-column: 3 / 9; }
@@ -661,13 +671,14 @@ img { max-width: 100%; display: block; }
   .solution { padding-bottom: 0; }
   .solutionIntro .sectionLabel { margin-bottom: 36px; }
   .layerStack { grid-column: 1 / 5; }
-  .layer { min-height: 190px; grid-template-columns: 42px 1fr; padding: 22px 20px; }
-  .layer p { grid-column: 2; }
-  .layer > span { font-size: 27px; }
-  .layer strong { font-size: 22px; }
-  .layerComposition { grid-column: 2; width: 100%; }
-  .layerComposition p { grid-column: auto; }
-  .layerTokens { min-height: 52px; }
+  .layer { min-height: 182px; grid-template-columns: minmax(145px, .9fr) minmax(0, 1.1fr); }
+  .layerLead { grid-template-columns: 30px minmax(0, 1fr); grid-template-rows: 1fr auto; column-gap: 8px; padding: 20px 12px; }
+  .layerLead > span { font-size: 25px; }
+  .layerLead strong { font-size: 18px; }
+  .layerLead p { font-size: 11px; }
+  .layerModules i { padding-inline: 3px; font-size: 8.5px; overflow-wrap: anywhere; }
+  .layerModules i::before { left: calc(50% - 10px); width: 20px; height: 7px; }
+  .layerModules i:not(:last-child)::after { top: calc(50% - 5px); right: -6px; width: 10px; height: 10px; }
   .solutionHandoff { grid-column: 1 / 5; margin-top: 72px; padding: 36px 0 112px; text-align: left; justify-items: start; }
   .solutionHandoff strong { font-size: clamp(32px, 10vw, 46px); }
   .solutionHandoff > i { left: 50%; height: 78px; }
