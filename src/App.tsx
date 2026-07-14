@@ -74,6 +74,20 @@ function StructureLayer({ number, label, detail, tokens, reduceMotion }: { numbe
   const y = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 0 : 34, 0, reduceMotion ? 0 : -8])
   const scale = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 1 : 0.965, 1, reduceMotion ? 1 : 0.985])
   const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [reduceMotion ? 1 : 0.32, 1, reduceMotion ? 1 : 0.78])
+  const tokenOpacity = useTransform(scrollYProgress, [0.08, 0.34, 0.58, 1], [reduceMotion ? 1 : 0.18, 0.62, 1, reduceMotion ? 1 : 0.72])
+  const tokenOneX = useTransform(scrollYProgress, [0.1, 0.58], [reduceMotion ? 0 : -24, 0])
+  const tokenOneY = useTransform(scrollYProgress, [0.1, 0.58], [reduceMotion ? 0 : 7, 0])
+  const tokenOneRotate = useTransform(scrollYProgress, [0.1, 0.58], [reduceMotion ? 0 : -1.2, 0])
+  const tokenTwoY = useTransform(scrollYProgress, [0.18, 0.62], [reduceMotion ? 0 : -9, 0])
+  const tokenTwoRotate = useTransform(scrollYProgress, [0.18, 0.62], [reduceMotion ? 0 : 0.8, 0])
+  const tokenThreeX = useTransform(scrollYProgress, [0.14, 0.62], [reduceMotion ? 0 : 24, 0])
+  const tokenThreeY = useTransform(scrollYProgress, [0.14, 0.62], [reduceMotion ? 0 : 6, 0])
+  const tokenThreeRotate = useTransform(scrollYProgress, [0.14, 0.62], [reduceMotion ? 0 : -0.6, 0])
+  const tokenMotion = [
+    { x: tokenOneX, y: tokenOneY, opacity: tokenOpacity, rotate: tokenOneRotate },
+    { y: tokenTwoY, opacity: tokenOpacity, rotate: tokenTwoRotate },
+    { x: tokenThreeX, y: tokenThreeY, opacity: tokenOpacity, rotate: tokenThreeRotate },
+  ]
 
   return (
     <motion.div ref={ref} className="layer" style={{ y, scale, opacity }}>
@@ -81,7 +95,7 @@ function StructureLayer({ number, label, detail, tokens, reduceMotion }: { numbe
       <div className="layerComposition">
         <p>{detail}</p>
         <div className="layerTokens" aria-label={`${label} primitives`}>
-          {tokens.map((token) => <i key={token}>{token}</i>)}
+          {tokens.map((token, index) => <motion.i key={token} style={tokenMotion[index]}>{token}</motion.i>)}
         </div>
       </div>
     </motion.div>

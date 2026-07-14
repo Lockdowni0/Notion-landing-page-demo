@@ -307,9 +307,26 @@ img { max-width: 100%; display: block; }
 .layer > span { font-size: 34px; font-weight: 300; }
 .layer strong { font-size: clamp(22px, 2.5vw, 34px); font-weight: 400; }
 .layer p { margin: 0; font-size: 14px; line-height: 1.4; }
-.layerComposition { display: grid; gap: 16px; }
-.layerTokens { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-.layerTokens i { padding: 8px 3px; border-top: 1px solid currentColor; background: color-mix(in srgb, var(--white) 42%, transparent); font-size: 9px; font-style: normal; text-align: center; }
+.layerComposition { display: grid; gap: 13px; align-content: center; }
+.layerComposition p { font-size: 13px; }
+.layerTokens { width: min(100%, 246px); display: flex; gap: 2px; padding-top: 5px; }
+.layerTokens i {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 7px 4px 6px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: color-mix(in srgb, var(--white) 48%, transparent);
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: .02em;
+  text-align: center;
+  transform-origin: center;
+}
+.layerTokens i::before { content: ""; position: absolute; top: -5px; left: calc(50% - 6px); width: 12px; height: 5px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-bottom: 0; background: var(--coral-pale); }
+.layer:first-child .layerTokens i::before { background: #f2f2ef; }
+.layerTokens i:not(:last-child)::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 3px); right: -5px; width: 6px; height: 6px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 50%; background: var(--coral-pale); }
+.layer:first-child .layerTokens i:not(:last-child)::after { background: #f2f2ef; }
 .solutionHandoff {
   grid-column: 3 / 11;
   position: relative;
