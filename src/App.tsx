@@ -19,7 +19,7 @@ const layers = [
   ['1', 'Visual Editor', 'Shape ideas directly.'],
   ['2', 'Structured Content', 'Turn information into data.'],
   ['3', 'LEGO for Software', 'Assemble your own workflow.'],
-  ['4', 'Marketplace', 'Build once. Serve many.'],
+  ['4', 'Marketplace', 'Publish once. Adapted by many.'],
 ]
 
 const planes = [
@@ -131,10 +131,10 @@ function App() {
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title" ref={heroRef}>
           <div className="heroGrid">
-            <motion.p className="heroDate" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>March 2013</motion.p>
+            <motion.p className="heroDate" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>March 2013 <span>Reimagined for the AI web</span></motion.p>
             <motion.div className="heroCopy" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}>
               <h1 id="hero-title">Democratize<br />Software.</h1>
-              <p>A home for your information, your tools, and the software you shape.</p>
+              <p>A living page that adapts to you—and becomes part of the software you shape.</p>
               <button className="textCta" onClick={() => scrollToId('demo')}>Begin shaping <span>→</span></button>
             </motion.div>
             <motion.div className="stoneStage" style={{ y: stoneY, rotate: stoneRotate }} initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.25 }}>
@@ -189,29 +189,27 @@ function App() {
                 </motion.div>
               ))}
             </div>
+            <motion.div
+              className="solutionHandoff"
+              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-12%' }}
+              transition={{ duration: 0.65 }}
+            >
+              <span>The page becomes the product surface.</span>
+              <strong>Start with a page. Shape it into software.</strong>
+              <i aria-hidden="true" />
+            </motion.div>
           </div>
-        </section>
-
-        <section className="narrativeBridge demoBridge" aria-labelledby="demo-bridge-title">
-          <motion.div
-            className="bridgeGrid"
-            initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-18%' }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          >
-            <p className="bridgeKicker">From idea to tool</p>
-            <h2 id="demo-bridge-title">Start with a page.<br /><em>Shape it into software.</em></h2>
-            <span className="bridgeRule" aria-hidden="true"><i /></span>
-          </motion.div>
         </section>
 
         <section className="demoSection section" id="demo" aria-labelledby="demo-title">
           <div className="demoIntro pageGrid">
             <SectionLabel number="03">Notion Demo</SectionLabel>
             <div className="sectionStatement">
+              <span className="demoThesis">The page is part of the product</span>
               <h2 id="demo-title">Start with information.<br />End with software.</h2>
-              <p>Shape a project page, give it structure, then see how the structure changes what happens next.</p>
+              <p>Begin the work here. The page remembers what you shape and carries it forward.</p>
             </div>
           </div>
 
@@ -284,30 +282,33 @@ function App() {
               <span className={state.previewed ? 'complete' : ''}>Tool</span>
             </div>
           </div>
-        </section>
 
-        <section className="narrativeBridge scaleBridge" aria-labelledby="scale-bridge-title" aria-live="polite">
           <motion.div
-            className="bridgeGrid"
+            className="demoHandoff"
             initial={reduceMotion ? false : { opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-18%' }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
+            viewport={{ once: true, margin: '-15%' }}
+            transition={{ duration: 0.65 }}
+            aria-live="polite"
           >
             <AnimatePresence mode="wait">
               <motion.div
-                className="scaleBridgeCopy"
-                key={state.previewed ? `shaped-${name}` : 'unshaped'}
-                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                className="demoHandoffCopy"
+                key={state.previewed ? `continued-${name}` : 'invitation'}
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
-                transition={{ duration: 0.35 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
               >
-                <p className="bridgeKicker">{state.previewed ? `You shaped ${name}.` : 'One tool can become many.'}</p>
-                <h2 id="scale-bridge-title">{state.previewed ? 'Now imagine one structure serving many.' : 'Build once. Serve many.'}</h2>
+                <span>{state.previewed ? `You shaped ${name}.` : 'The page is the first product surface.'}</span>
+                <strong>{state.previewed ? 'The page remembers. The product continues.' : 'Shape one tool. Carry its structure forward.'}</strong>
               </motion.div>
             </AnimatePresence>
-            <span className="bridgeRule" aria-hidden="true"><i /></span>
+            <motion.div className="handoffSeed" layout>
+              <span>Live structure</span>
+              <strong>{state.previewed ? name : 'Your tool'}</strong>
+              <div>{state.view === 'table' ? <><i>Owner</i><i>Status</i><i>Due</i></> : <><i>Not started</i><i>In progress</i><i>Done</i></>}</div>
+            </motion.div>
           </motion.div>
         </section>
 
@@ -336,16 +337,31 @@ function App() {
             <div className="consequenceList">
               {adaptedConsequences.map((item, index) => <p key={item}><span>0{index + 1}</span>{item}</p>)}
             </div>
+            <motion.div
+              className="marketplacePath"
+              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-12%' }}
+              transition={{ duration: 0.65 }}
+            >
+              <span className="marketplaceLine" aria-hidden="true"><i /></span>
+              <div className="marketplaceCopy">
+                <span>Marketplace / Publish</span>
+                <h3>Publish as a template.</h3>
+                <p>Built once. Adapted by many.</p>
+              </div>
+              <div className="templateTrace" aria-hidden="true"><span>Project brief</span><span>Client portal</span><span>Team launch</span></div>
+            </motion.div>
           </div>
         </section>
 
         <section className="finalCta section" aria-labelledby="final-title">
           <div className="pageGrid finalGrid">
-            <p className="finalEyebrow">{state.previewed ? `You shaped ${name}` : 'Democratize Software'}</p>
-            <h2 id="final-title">{state.previewed ? <>Every structure<br />changes what happens next.</> : <>Shape the tools<br />that will shape you.</>}</h2>
+            <p className="finalEyebrow">{state.previewed ? 'The page changed with you' : 'A view of the AI web'}</p>
+            <h2 id="final-title">{state.previewed ? <>The website is already<br />part of the product.</> : <>The website is where<br />the product begins.</>}</h2>
             <p className="finalSupport">{state.previewed
-              ? state.view === 'board' ? 'The workflow you created now shapes how the work moves.' : 'The fields you created now shape what the work reveals.'
-              : 'Bring the creative power of software to the way you already think and work.'}</p>
+              ? `It understood your choices, adapted the experience, and carried ${name} forward.`
+              : 'Future AI pages should understand intent, adapt in real time, and let people begin before they sign up.'}</p>
             <div className="finalActions">
               <button className="textCta" onClick={() => state.previewed ? setResetOpen(true) : scrollToId('demo')}>{state.previewed ? 'Shape another tool' : 'Start building'} <span>→</span></button>
               {state.previewed && <button className="secondaryText" onClick={() => scrollToId('demo')}>Return to your tool</button>}
