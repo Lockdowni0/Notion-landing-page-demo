@@ -15,19 +15,27 @@ import {
 const STORAGE_KEY = 'notion-2013-demo:v1'
 
 const layers = [
-  ['0', 'Web', 'Available anywhere.'],
-  ['1', 'Visual Editor', 'Shape ideas directly.'],
-  ['2', 'Structured Content', 'Turn information into data.'],
-  ['3', 'LEGO for Software', 'Assemble your own workflow.'],
-  ['4', 'Marketplace', 'Publish once. Adapted by many.'],
-]
+  ['0', 'Content', 'Keep information portable.', ['Text', 'Task', 'Asset']],
+  ['1', 'Properties', 'Give information structure.', ['Owner', 'Status', 'Due']],
+  ['2', 'Views', 'Recompose the same data.', ['Table', 'Board', 'Portal']],
+  ['3', 'Behavior', 'Decide how work moves.', ['Filter', 'Permission', 'Workflow']],
+  ['4', 'Publish', 'Save the composition as a recipe.', ['Template', 'Adapt', 'Reuse']],
+] as const
 
 const planes = [
-  { name: 'Document', detail: 'launch-plan-FINAL.doc', className: 'planeDocument' },
-  { name: 'Mail', detail: 'Re: Re: Final changes', className: 'planeMail' },
-  { name: 'Design', detail: 'mock-v8-final', className: 'planeDesign' },
-  { name: 'Project', detail: 'Waiting for update', className: 'planeProject' },
+  { name: 'Document', detail: 'launch-plan-FINAL.doc', primitive: 'Brief', className: 'planeDocument' },
+  { name: 'Mail', detail: 'Re: Re: Final changes', primitive: 'Decision', className: 'planeMail' },
+  { name: 'Design', detail: 'mock-v8-final', primitive: 'Asset', className: 'planeDesign' },
+  { name: 'Project', detail: 'Waiting for update', primitive: 'Task', className: 'planeProject' },
 ]
+
+type SurfaceId = 'project' | 'client' | 'team'
+
+const surfaces: Record<SurfaceId, { label: string; eyebrow: string; detail: string; fields: string[] }> = {
+  project: { label: 'Project tracker', eyebrow: 'Operational view', detail: 'The team sees ownership, status, and the next deadline.', fields: ['Owner', 'Status', 'Due'] },
+  client: { label: 'Client portal', eyebrow: 'External view', detail: 'The same work becomes a calm surface for progress and delivery.', fields: ['Progress', 'Delivery', 'Updates'] },
+  team: { label: 'Team workflow', eyebrow: 'Flow view', detail: 'The same structure becomes a shared path from start to done.', fields: ['Stage', 'Owner', 'Next step'] },
+}
 
 const statusOrder: StatusId[] = ['not-started', 'in-progress', 'done']
 
@@ -60,37 +68,22 @@ function PersonGlyph() {
   return <span className="personGlyph" aria-hidden="true"><i /><b /></span>
 }
 
-function StructureLayer({ number, label, detail, reduceMotion }: { number: string; label: string; detail: string; reduceMotion: boolean | null }) {
+function StructureLayer({ number, label, detail, tokens, reduceMotion }: { number: string; label: string; detail: string; tokens: readonly string[]; reduceMotion: boolean | null }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 88%', 'end 24%'] })
   const y = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 0 : 34, 0, reduceMotion ? 0 : -8])
   const scale = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 1 : 0.965, 1, reduceMotion ? 1 : 0.985])
   const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [reduceMotion ? 1 : 0.32, 1, reduceMotion ? 1 : 0.78])
-  const pieceOneX = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 0 : -38, 0])
-  const pieceOneY = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 0 : 18, 0])
-  const pieceTwoX = useTransform(scrollYProgress, [0.08, 0.56], [reduceMotion ? 0 : 34, 0])
-  const pieceTwoY = useTransform(scrollYProgress, [0.08, 0.56], [reduceMotion ? 0 : -17, 0])
-  const pieceThreeX = useTransform(scrollYProgress, [0.16, 0.64], [reduceMotion ? 0 : -24, 0])
-  const pieceThreeY = useTransform(scrollYProgress, [0.16, 0.64], [reduceMotion ? 0 : -20, 0])
-  const pieceFourX = useTransform(scrollYProgress, [0.24, 0.72], [reduceMotion ? 0 : 32, 0])
-  const pieceFourY = useTransform(scrollYProgress, [0.24, 0.72], [reduceMotion ? 0 : 20, 0])
-  const assemblyScale = useTransform(scrollYProgress, [0.28, 0.72, 1], [reduceMotion ? 1 : 0.94, 1, reduceMotion ? 1 : 0.98])
-  const isLego = label === 'LEGO for Software'
 
   return (
-    <motion.div ref={ref} className={`layer${isLego ? ' legoLayer' : ''}`} style={{ y, scale, opacity }}>
+    <motion.div ref={ref} className="layer" style={{ y, scale, opacity }}>
       <span>{number}</span><strong>{label}</strong>
-      {isLego ? (
-        <div className="legoLayerCopy">
-          <p>{detail}</p>
-          <motion.div className="legoAssembly" style={{ scale: assemblyScale }} aria-label="Four software modules assembling into one tool">
-            <motion.i style={{ x: pieceOneX, y: pieceOneY }}><b /><b /></motion.i>
-            <motion.i style={{ x: pieceTwoX, y: pieceTwoY }}><b /><b /><b /></motion.i>
-            <motion.i style={{ x: pieceThreeX, y: pieceThreeY }}><b /><b /></motion.i>
-            <motion.i style={{ x: pieceFourX, y: pieceFourY }}><b /><b /><b /></motion.i>
-          </motion.div>
+      <div className="layerComposition">
+        <p>{detail}</p>
+        <div className="layerTokens" aria-label={`${label} primitives`}>
+          {tokens.map((token) => <i key={token}>{token}</i>)}
         </div>
-      ) : <p>{detail}</p>}
+      </div>
     </motion.div>
   )
 }
@@ -128,6 +121,7 @@ function App() {
   const [state, dispatch] = useReducer(demoReducer, undefined, loadState)
   const [resetOpen, setResetOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [surface, setSurface] = useState<SurfaceId>('project')
   const resetCancelRef = useRef<HTMLButtonElement>(null)
   const name = displayProjectName(state.projectName)
 
@@ -144,14 +138,16 @@ function App() {
   }, [resetOpen])
 
   const adaptedConsequences = useMemo(() => {
-    if (state.view === 'board') {
-      return ['Three states give the work a shared path.', 'Movement makes the next action visible.', 'Everyone sees where work is waiting.']
-    }
-    return ['Owner makes responsibility visible.', 'Status sets the next step.', 'Due dates give the work a rhythm.']
-  }, [state.view])
+    if (surface === 'client') return ['Internal detail becomes a clear progress signal.', 'The underlying work stays connected.', 'One structure serves a different audience.']
+    if (surface === 'team') return ['Stages create a shared path.', 'Movement makes the next action visible.', 'The same data now behaves like a workflow.']
+    return state.view === 'board'
+      ? ['Three states give the work a shared path.', 'Movement makes the next action visible.', 'Everyone sees where work is waiting.']
+      : ['Owner makes responsibility visible.', 'Status sets the next step.', 'Due dates give the work a rhythm.']
+  }, [state.view, surface])
 
   function confirmReset() {
     dispatch({ type: 'reset' })
+    setSurface('project')
     try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* no-op */ }
     setResetOpen(false)
   }
@@ -220,12 +216,19 @@ function App() {
                   <h3>{plane.name}</h3>
                   <div className="planeLines" aria-hidden="true"><i /><i /><i /></div>
                   <p>{plane.detail}</p>
+                  <span className="planePrimitive">Keep: {plane.primitive}</span>
                 </motion.article>
               ))}
               <motion.svg className="handoffLines" viewBox="0 0 900 240" aria-hidden="true">
                 <motion.path d="M115 120 C250 5 310 235 445 120 S690 10 810 120" style={reduceMotion ? undefined : { pathLength: problemPathLength, opacity: problemPathOpacity }} initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }} animate={reduceMotion ? { pathLength: 1, opacity: 0.55 } : undefined} />
               </motion.svg>
             </div>
+            <motion.div className="primitiveRelease" initial={reduceMotion ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-14%' }}>
+              <div><span>What survives the applications</span><strong>Keep the primitives. Lose the silos.</strong></div>
+              <div className="primitiveRail">
+                {planes.map((plane, index) => <motion.i key={plane.primitive} initial={reduceMotion ? false : { opacity: 0, x: (index - 1.5) * 34 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false, margin: '-12%' }} transition={{ delay: index * 0.08 }}>{plane.primitive}</motion.i>)}
+              </div>
+            </motion.div>
             <blockquote className="marsQuote">We can’t go to Mars by sending Word documents around.</blockquote>
             <p className="turnQuestion">What if the tool adapted to you?</p>
             <motion.div className="problemSpine" style={{ scaleY: reduceMotion ? 1 : problemSpineScale }} aria-hidden="true"><i /></motion.div>
@@ -238,12 +241,13 @@ function App() {
             <div className="solutionBody">
               <div className="solutionIntro">
                 <SectionLabel number="02">Solution</SectionLabel>
+                <span className="solutionThesis">LEGO for Software</span>
                 <h2 id="solution-title">A centralized home for your <em>information &amp; software.</em></h2>
-                <p>Start with a page. Give it structure. Shape it into a tool.</p>
+                <p>Start with information. Add structure, views, and behavior. Keep composing until the page becomes the tool.</p>
               </div>
               <div className="layerStack">
-                {layers.map(([number, label, detail]) => (
-                  <StructureLayer key={number} number={number} label={label} detail={detail} reduceMotion={reduceMotion} />
+                {layers.map(([number, label, detail, tokens]) => (
+                  <StructureLayer key={number} number={number} label={label} detail={detail} tokens={tokens} reduceMotion={reduceMotion} />
                 ))}
               </div>
             </div>
@@ -256,7 +260,7 @@ function App() {
             >
               <motion.div className="pageAssembly" style={reduceMotion ? undefined : { scaleX: pageFrameScaleX, scaleY: pageFrameScaleY, opacity: pageFrameOpacity }} aria-hidden="true"><i /><b /><b /></motion.div>
               <span>The page becomes the product surface.</span>
-              <strong>Start with a page. Shape it into software.</strong>
+              <strong>One set of primitives. Many possible tools.</strong>
               <i aria-hidden="true" />
             </motion.div>
           </div>
@@ -268,7 +272,7 @@ function App() {
             <div className="sectionStatement">
               <span className="demoThesis">The page is part of the product</span>
               <h2 id="demo-title">Start with information.<br />End with software.</h2>
-              <p>Begin the work here. The page remembers what you shape and carries it forward.</p>
+              <p>Describe the work. The page proposes a structure. You decide how the software should behave.</p>
             </div>
           </div>
 
@@ -306,7 +310,7 @@ function App() {
                     <span className="utilityLabel">Blocks</span>
                     <button onClick={() => dispatch({ type: 'set-note', note: state.note || 'A note about this work.' })}><b>+</b> Text</button>
                     <button onClick={() => dispatch({ type: 'add-task' })}><b>+</b> Task</button>
-                    <p>Shape the page directly. Structure comes next.</p>
+                    <p>Add information primitives. The page will help compose them.</p>
                   </aside>
                   <div className="editorCanvas">
                     <input className="projectName" value={state.projectName} onChange={(event) => dispatch({ type: 'rename', name: event.target.value })} aria-label="Project name" maxLength={80} />
@@ -316,10 +320,20 @@ function App() {
                         {state.tasks.map((task) => <LooseTask key={task.id} task={task} onChange={(value) => dispatch({ type: 'update-task', id: task.id, field: 'title', value })} />)}
                         {!state.tasks.length && <p className="emptyHint">Start with an empty page.</p>}
                         <button className="addInline" onClick={() => dispatch({ type: 'add-task' })}>+ Add a task</button>
-                        <button className="structureButton" onClick={() => dispatch({ type: 'structure' })}>Give these tasks structure <span>→</span></button>
+                        <div className="structureSuggestion" aria-live="polite">
+                          <span>Suggested from this page</span>
+                          <p>{state.tasks.length
+                            ? `I found ${state.tasks.length} task${state.tasks.length === 1 ? '' : 's'}. Add Owner, Status, Due date, and a view?`
+                            : 'This looks like a launch workflow. Start with tasks, Owner, Status, Due date, and a view?'}</p>
+                          <button className="structureButton" onClick={() => dispatch({ type: 'structure' })}>Apply this composition <span>→</span></button>
+                        </div>
                       </div>
                     ) : (
                       <div className="structuredArea">
+                        <div className="activeRecipe">
+                          <span>Active composition</span>
+                          <div><i>Tasks</i><i>Owner</i><i>Status</i><i>Due</i><i>{state.view === 'table' ? 'Table' : 'Board'}</i></div>
+                        </div>
                         <div className="viewRow">
                           <span className="utilityLabel">View</span>
                           <ViewToggle view={state.view} onChange={(view) => dispatch({ type: 'set-view', view })} />
@@ -375,10 +389,10 @@ function App() {
           <div className="pageGrid platformGrid">
             <SectionLabel number="04">{state.previewed ? 'Your structure, at work' : 'Platform'}</SectionLabel>
             <div className="platformStatement">
-              <h2 id="platform-title">{state.previewed ? `${name} is already shaping the work.` : 'One structure. Many ways to work.'}</h2>
+              <h2 id="platform-title">{state.previewed ? `${name} is already shaping the work.` : 'One structure. Many products.'}</h2>
               <p>{state.previewed
                 ? state.view === 'board' ? 'The workflow you chose now decides how work moves from one state to the next.' : 'The fields you chose now decide what the team can see, sort, and act on.'
-                : 'One structure can become a project tracker, a client portal, or a team workspace.'}</p>
+                : 'Change the audience or behavior. The underlying information stays connected.'}</p>
             </div>
             <div className={`platformDiagram ${state.view}`}>
               <motion.div className="sourceModule" layout initial={reduceMotion ? false : { opacity: 0.35, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: false, margin: '-16%' }} transition={{ duration: 0.65 }}>
@@ -390,8 +404,14 @@ function App() {
               </motion.div>
               <motion.svg viewBox="0 0 700 170" aria-hidden="true"><motion.path d="M350 0v52M350 52 90 145M350 52v93M350 52l260 93" style={reduceMotion ? undefined : { pathLength: platformBranchLength, opacity: platformBranchOpacity }} initial={reduceMotion ? false : { pathLength: 0 }} animate={reduceMotion ? { pathLength: 1, opacity: 1 } : undefined} /></motion.svg>
               <div className="destinations">
-                {['Your project', 'Client view', 'Team workflow'].map((label, index) => <motion.div key={label} initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-10%' }} transition={{ duration: 0.45, delay: index * 0.12 }}><PersonGlyph /><span>{label}</span></motion.div>)}
+                {(Object.entries(surfaces) as [SurfaceId, (typeof surfaces)[SurfaceId]][]).map(([id, item], index) => <motion.button type="button" className={surface === id ? 'active' : ''} aria-pressed={surface === id} onClick={() => setSurface(id)} key={id} initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-10%' }} transition={{ duration: 0.45, delay: index * 0.12 }}><PersonGlyph /><span>{item.label}</span><i>Compose →</i></motion.button>)}
               </div>
+              <AnimatePresence mode="wait">
+                <motion.div className="surfacePreview" key={surface} initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
+                  <div><span>{surfaces[surface].eyebrow}</span><strong>{state.previewed ? name : 'Launch Plan'}</strong><p>{surfaces[surface].detail}</p></div>
+                  <div>{surfaces[surface].fields.map((field) => <i key={field}>{field}</i>)}</div>
+                </motion.div>
+              </AnimatePresence>
             </div>
             <div className="consequenceList">
               {adaptedConsequences.map((item, index) => <p key={item}><span>0{index + 1}</span>{item}</p>)}
@@ -406,10 +426,15 @@ function App() {
               <span className="marketplaceLine" aria-hidden="true"><motion.i initial={reduceMotion ? false : { scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: false }} transition={{ duration: 0.8, ease: 'easeOut' }} /></span>
               <div className="marketplaceCopy">
                 <span>Marketplace / Publish</span>
-                <h3>Publish as a template.</h3>
-                <p>Built once. Adapted by many.</p>
+                <h3>Publish the composition.</h3>
+                <p>The content stays yours. The structure becomes reusable.</p>
               </div>
-              <div className="templateTrace" aria-hidden="true"><span>Project brief</span><span>Client portal</span><span>Team launch</span></div>
+              <div className="templateTrace">
+                <strong>Reusable recipe</strong>
+                <span>Tasks + Owner + Status + Due</span>
+                <span>{state.view === 'table' ? 'Table view' : 'Board view'} + {surfaces[surface].label}</span>
+                <span>Adapt to another page →</span>
+              </div>
             </motion.div>
           </div>
         </section>
