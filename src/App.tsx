@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
-import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
+import { Fragment, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties, type Dispatch } from 'react'
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import {
   demoReducer,
   displayProjectName,
@@ -61,6 +61,68 @@ function SectionLabel({ number, children }: { number: string; children: string }
       <span>{number}</span>
       <span>{children}</span>
     </div>
+  )
+}
+
+type HeadingPart = { text: string; emphasis?: boolean; breakAfter?: boolean }
+
+function AssembledHeading({ as: Tag, id, parts, reduceMotion, intro = false }: { as: 'h1' | 'h2'; id: string; parts: HeadingPart[]; reduceMotion: boolean | null; intro?: boolean }) {
+  const ref = useRef<HTMLHeadingElement>(null)
+  const label = parts.map((part) => part.text).join(' ')
+  const totalCharacters = Array.from(label.replace(/\s/g, '')).length
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 88%', 'start 44%'] })
+  const [visibleCharacters, setVisibleCharacters] = useState(reduceMotion || intro ? totalCharacters : 0)
+
+  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+    if (intro) return
+    setVisibleCharacters(reduceMotion ? totalCharacters : Math.ceil(latest * totalCharacters))
+  })
+
+  useEffect(() => {
+    if (intro || reduceMotion) {
+      setVisibleCharacters(totalCharacters)
+      return
+    }
+    setVisibleCharacters(Math.ceil(scrollYProgress.get() * totalCharacters))
+  }, [intro, label, reduceMotion, scrollYProgress, totalCharacters])
+
+  let characterIndex = 0
+  const renderPart = (part: HeadingPart, partIndex: number) => {
+    const words = part.text.split(' ')
+    const content = words.map((word, wordIndex) => (
+      <Fragment key={`${partIndex}-${wordIndex}`}>
+        <span className="assembledWord">
+          {Array.from(word).map((character) => {
+            const index = characterIndex++
+            return (
+              <span
+                aria-hidden="true"
+                className="assembledChar"
+                data-visible={intro || reduceMotion || index < visibleCharacters ? 'true' : 'false'}
+                key={`${character}-${index}`}
+                style={{ '--char-index': index, '--char-delay': `${index * 18}ms` } as CSSProperties}
+              >
+                {character}
+              </span>
+            )
+          })}
+        </span>
+        {wordIndex < words.length - 1 ? ' ' : null}
+      </Fragment>
+    ))
+
+    return part.emphasis ? <em>{content}</em> : <span className="assembledPart">{content}</span>
+  }
+
+  return (
+    <Tag ref={ref} id={id} aria-label={label} className={`assembledHeading${intro ? ' assembledHeadingIntro' : ''}`}>
+      {parts.map((part, index) => (
+        <Fragment key={`${part.text}-${index}`}>
+          {renderPart(part, index)}
+          {part.breakAfter ? <br /> : index < parts.length - 1 ? ' ' : null}
+        </Fragment>
+      ))}
+    </Tag>
   )
 }
 
@@ -196,7 +258,7 @@ function App() {
           <div className="heroGrid">
             <motion.p className="heroDate" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>March 2013 <span>Reimagined for the AI web</span></motion.p>
             <motion.div className="heroCopy" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}>
-              <h1 id="hero-title">Democratize<br />Software.</h1>
+              <AssembledHeading as="h1" id="hero-title" parts={[{ text: 'Democratize', breakAfter: true }, { text: 'Software.' }]} reduceMotion={reduceMotion} intro />
               <p>A living page that adapts to you—and becomes part of the software you shape.</p>
               <button className="textCta" onClick={() => scrollToId('demo')}>Begin shaping <span>→</span></button>
             </motion.div>
@@ -217,7 +279,7 @@ function App() {
           <div className="pageGrid">
             <SectionLabel number="01">Problem</SectionLabel>
             <div className="sectionStatement problemStatement">
-              <h2 id="problem-title">Software became a collection of applications.</h2>
+              <AssembledHeading as="h2" id="problem-title" parts={[{ text: 'Software became a collection of applications.' }]} reduceMotion={reduceMotion} />
               <p>Ideas live in one place. Conversations in another. The final work somewhere else.</p>
             </div>
             <div className="planes" aria-label="Information scattered across four applications">
@@ -253,7 +315,7 @@ function App() {
               <div className="solutionIntro">
                 <SectionLabel number="02">Solution</SectionLabel>
                 <span className="solutionThesis">LEGO for Software</span>
-                <h2 id="solution-title">A centralized home for your <em>information &amp; software.</em></h2>
+                <AssembledHeading as="h2" id="solution-title" parts={[{ text: 'A centralized home for your' }, { text: 'information & software.', emphasis: true }]} reduceMotion={reduceMotion} />
                 <p>Start with information. Add structure, views, and behavior. Keep composing until the page becomes the tool.</p>
               </div>
               <div className="layerStack">
@@ -282,7 +344,7 @@ function App() {
             <SectionLabel number="03">Notion Demo</SectionLabel>
             <div className="sectionStatement">
               <span className="demoThesis">The page is part of the product</span>
-              <h2 id="demo-title">Start with information.<br />End with software.</h2>
+              <AssembledHeading as="h2" id="demo-title" parts={[{ text: 'Start with information.', breakAfter: true }, { text: 'End with software.' }]} reduceMotion={reduceMotion} />
               <p>Describe the work. The page proposes a structure. You decide how the software should behave.</p>
             </div>
           </div>
@@ -400,7 +462,7 @@ function App() {
           <div className="pageGrid platformGrid">
             <SectionLabel number="04">{state.previewed ? 'Your structure, at work' : 'Platform'}</SectionLabel>
             <div className="platformStatement">
-              <h2 id="platform-title">{state.previewed ? `${name} is already shaping the work.` : 'One structure. Many products.'}</h2>
+              <AssembledHeading as="h2" id="platform-title" parts={[{ text: state.previewed ? `${name} is already shaping the work.` : 'One structure. Many products.' }]} reduceMotion={reduceMotion} />
               <p>{state.previewed
                 ? state.view === 'board' ? 'The workflow you chose now decides how work moves from one state to the next.' : 'The fields you chose now decide what the team can see, sort, and act on.'
                 : 'Change the audience or behavior. The underlying information stays connected.'}</p>
@@ -453,7 +515,11 @@ function App() {
         <section className="finalCta section" aria-labelledby="final-title">
           <div className="pageGrid finalGrid">
             <p className="finalEyebrow">{state.previewed ? 'The page changed with you' : 'A view of the AI web'}</p>
-            <h2 id="final-title">{state.previewed ? <>The website is already<br />part of the product.</> : <>The website is where<br />the product begins.</>}</h2>
+            <AssembledHeading as="h2" id="final-title" parts={state.previewed
+              ? [{ text: 'The website is already', breakAfter: true }, { text: 'part of the product.' }]
+              : [{ text: 'The website is where', breakAfter: true }, { text: 'the product begins.' }]}
+              reduceMotion={reduceMotion}
+            />
             <p className="finalSupport">{state.previewed
               ? `It understood your choices, adapted the experience, and carried ${name} forward.`
               : 'Future AI pages should understand intent, adapt in real time, and let people begin before they sign up.'}</p>

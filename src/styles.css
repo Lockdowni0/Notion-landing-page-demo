@@ -218,6 +218,18 @@ img { max-width: 100%; display: block; }
   line-height: .98;
   letter-spacing: -.045em;
 }
+.assembledWord { display: inline-block; white-space: nowrap; }
+.assembledChar {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(3px);
+  transform: translateY(.24em) scaleX(.82);
+  transform-origin: left bottom;
+  transition: opacity .07s linear, filter .11s linear, transform .13s cubic-bezier(.2,.8,.2,1);
+  will-change: opacity, filter, transform;
+}
+.assembledChar[data-visible="true"] { opacity: 1; filter: blur(0); transform: translateY(0) scaleX(1); }
+.assembledHeadingIntro .assembledChar { animation: heading-assemble .28s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(.22s + var(--char-delay)); }
 .sectionStatement > p, .solutionIntro > p, .platformStatement > p {
   max-width: 540px;
   margin: 32px 0 0;
@@ -584,6 +596,10 @@ img { max-width: 100%; display: block; }
 @keyframes orbit-guide-reverse {
   from { transform: rotate(-8deg); }
   to { transform: rotate(-368deg); }
+}
+@keyframes heading-assemble {
+  from { opacity: 0; filter: blur(3px); transform: translateY(.24em) scaleX(.82); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0) scaleX(1); }
 }
 
 @media (max-width: 1199px) {
