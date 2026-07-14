@@ -519,7 +519,7 @@ img { max-width: 100%; display: block; }
 .demoHandoff::before { content: ""; position: absolute; top: 0; left: 50%; width: 1px; height: 58px; background: var(--coral); }
 .demoHandoffCopy { grid-column: 2 / 7; display: grid; gap: 18px; }
 .demoHandoffCopy strong { font-size: clamp(30px, 3.8vw, 52px); font-weight: 400; line-height: 1.04; letter-spacing: -.04em; }
-.handoffSeed { grid-column: 8 / 12; position: relative; padding: 20px 0 24px; border-top: 1px solid var(--coral); }
+.handoffSeed { grid-column: 8 / 12; position: relative; padding: 22px 24px 24px; border-top: 1px solid var(--coral); background: var(--coral-pale); }
 .handoffSeed::after { content: ""; position: absolute; top: 100%; left: 50%; width: 1px; height: 88px; background: linear-gradient(var(--coral), color-mix(in srgb, var(--coral) 8%, transparent)); }
 .handoffSeed > span { color: var(--coral); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; }
 .handoffSeed > strong { display: block; margin-top: 10px; font-size: 24px; font-weight: 400; }
