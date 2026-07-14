@@ -252,7 +252,6 @@ function App() {
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title" ref={heroRef}>
           <div className="heroGrid">
-            <motion.p className="heroDate" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>March 2013 <span>Reimagined for the AI web</span></motion.p>
             <motion.div className="heroCopy" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}>
               <AssembledHeading as="h1" id="hero-title" parts={[{ text: 'Democratize', breakAfter: true }, { text: 'Software.' }]} reduceMotion={reduceMotion} intro />
               <p>A living page that adapts to you—and becomes part of the software you shape.</p>
