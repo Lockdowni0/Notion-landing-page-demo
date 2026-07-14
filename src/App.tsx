@@ -38,6 +38,7 @@ const surfaces: Record<SurfaceId, { label: string; eyebrow: string; detail: stri
 }
 
 const statusOrder: StatusId[] = ['not-started', 'in-progress', 'done']
+const stoneToolSrc = `${import.meta.env.BASE_URL}assets/stone-tool.png`
 
 function loadState(): DemoState {
   try {
@@ -261,7 +262,7 @@ function App() {
             <motion.div className="stoneStage" style={{ y: stoneY, rotate: stoneRotate }} initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.25 }}>
               <span className="stoneGuide stoneGuideOne" />
               <span className="stoneGuide stoneGuideTwo" />
-              <img src="/assets/stone-tool.png" alt="A hand-drawn stone tool, representing the beginning of human-made tools." />
+              <img src={stoneToolSrc} alt="A hand-drawn stone tool, representing the beginning of human-made tools." />
               <span className="stoneIndex">01 / TOOL</span>
             </motion.div>
             <motion.blockquote className="heroQuote" style={{ y: quoteY }} initial={reduceMotion ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.65 }}>
