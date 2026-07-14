@@ -334,7 +334,6 @@ img { max-width: 100%; display: block; }
   transform-origin: center right;
   transition: background .2s ease;
 }
-.layerModules i::before { content: ""; position: absolute; top: 0; left: calc(50% - 17px); width: 34px; height: 9px; border-inline: 1px solid color-mix(in srgb, currentColor 30%, transparent); background: color-mix(in srgb, var(--white) 24%, transparent); }
 .layerModules i:not(:last-child)::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 7px); right: -8px; width: 14px; height: 14px; border: 1px solid color-mix(in srgb, currentColor 34%, transparent); border-radius: 50%; background: inherit; }
 .solutionHandoff {
   grid-column: 3 / 11;
@@ -677,7 +676,6 @@ img { max-width: 100%; display: block; }
   .layerLead strong { font-size: 18px; }
   .layerLead p { font-size: 11px; }
   .layerModules i { padding-inline: 3px; font-size: 8.5px; overflow-wrap: anywhere; }
-  .layerModules i::before { left: calc(50% - 10px); width: 20px; height: 7px; }
   .layerModules i:not(:last-child)::after { top: calc(50% - 5px); right: -6px; width: 10px; height: 10px; }
   .solutionHandoff { grid-column: 1 / 5; margin-top: 72px; padding: 36px 0 112px; text-align: left; justify-items: start; }
   .solutionHandoff strong { font-size: clamp(32px, 10vw, 46px); }
