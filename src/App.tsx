@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
-import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'motion/react'
 import {
   demoReducer,
   displayProjectName,
@@ -20,6 +20,14 @@ const layers = [
   ['2', 'Views', 'Recompose the same data.', ['Table', 'Board', 'Portal']],
   ['3', 'Behavior', 'Decide how work moves.', ['Filter', 'Permission', 'Workflow']],
   ['4', 'Publish', 'Save the composition as a recipe.', ['Template', 'Adapt', 'Reuse']],
+] as const
+
+const layerAssemblyRanges = [
+  [0.08, 0.24],
+  [0.22, 0.38],
+  [0.36, 0.52],
+  [0.50, 0.66],
+  [0.64, 0.80],
 ] as const
 
 const planes = [
@@ -68,29 +76,32 @@ function PersonGlyph() {
   return <span className="personGlyph" aria-hidden="true"><i /><b /></span>
 }
 
-function StructureLayer({ number, label, detail, tokens, reduceMotion }: { number: string; label: string; detail: string; tokens: readonly string[]; reduceMotion: boolean | null }) {
+function StructureLayer({ number, label, detail, tokens, reduceMotion, compositionProgress, assemblyRange }: { number: string; label: string; detail: string; tokens: readonly string[]; reduceMotion: boolean | null; compositionProgress: MotionValue<number>; assemblyRange: readonly [number, number] }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 88%', 'end 24%'] })
   const y = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 0 : 34, 0, reduceMotion ? 0 : -8])
   const scale = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 1 : 0.965, 1, reduceMotion ? 1 : 0.985])
   const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [reduceMotion ? 1 : 0.32, 1, reduceMotion ? 1 : 0.78])
-  const tokenOpacity = useTransform(scrollYProgress, [0.08, 0.34, 0.58, 1], [reduceMotion ? 1 : 0.18, 0.62, 1, reduceMotion ? 1 : 0.72])
-  const tokenOneX = useTransform(scrollYProgress, [0.1, 0.58], [reduceMotion ? 0 : -24, 0])
-  const tokenOneY = useTransform(scrollYProgress, [0.1, 0.58], [reduceMotion ? 0 : 7, 0])
-  const tokenOneRotate = useTransform(scrollYProgress, [0.1, 0.58], [reduceMotion ? 0 : -1.2, 0])
-  const tokenTwoY = useTransform(scrollYProgress, [0.18, 0.62], [reduceMotion ? 0 : -9, 0])
-  const tokenTwoRotate = useTransform(scrollYProgress, [0.18, 0.62], [reduceMotion ? 0 : 0.8, 0])
-  const tokenThreeX = useTransform(scrollYProgress, [0.14, 0.62], [reduceMotion ? 0 : 24, 0])
-  const tokenThreeY = useTransform(scrollYProgress, [0.14, 0.62], [reduceMotion ? 0 : 6, 0])
-  const tokenThreeRotate = useTransform(scrollYProgress, [0.14, 0.62], [reduceMotion ? 0 : -0.6, 0])
+  const [start, end] = assemblyRange
+  const interval = end - start
+  const tokenOneRawX = useTransform(compositionProgress, [start, end], [reduceMotion ? 0 : 250, 0])
+  const tokenTwoRawX = useTransform(compositionProgress, [start + interval * 0.16, end + interval * 0.08], [reduceMotion ? 0 : 315, 0])
+  const tokenThreeRawX = useTransform(compositionProgress, [start + interval * 0.32, end + interval * 0.16], [reduceMotion ? 0 : 380, 0])
+  const tokenOneX = useSpring(tokenOneRawX, { stiffness: 210, damping: 27, mass: 0.26 })
+  const tokenTwoX = useSpring(tokenTwoRawX, { stiffness: 210, damping: 27, mass: 0.26 })
+  const tokenThreeX = useSpring(tokenThreeRawX, { stiffness: 210, damping: 27, mass: 0.26 })
+  const tokenOneOpacity = useTransform(compositionProgress, [start, start + interval * 0.5], [reduceMotion ? 1 : 0, 1])
+  const tokenTwoOpacity = useTransform(compositionProgress, [start + interval * 0.16, start + interval * 0.66], [reduceMotion ? 1 : 0, 1])
+  const tokenThreeOpacity = useTransform(compositionProgress, [start + interval * 0.32, end], [reduceMotion ? 1 : 0, 1])
+  const borderLeftColor = useTransform(compositionProgress, [start, end], ['rgba(244,95,86,0)', 'rgba(244,95,86,1)'])
   const tokenMotion = [
-    { x: tokenOneX, y: tokenOneY, opacity: tokenOpacity, rotate: tokenOneRotate },
-    { y: tokenTwoY, opacity: tokenOpacity, rotate: tokenTwoRotate },
-    { x: tokenThreeX, y: tokenThreeY, opacity: tokenOpacity, rotate: tokenThreeRotate },
+    { x: tokenOneX, opacity: tokenOneOpacity },
+    { x: tokenTwoX, opacity: tokenTwoOpacity },
+    { x: tokenThreeX, opacity: tokenThreeOpacity },
   ]
 
   return (
-    <motion.div ref={ref} className="layer" style={{ y, scale, opacity }}>
+    <motion.div ref={ref} className="layer" data-layer={label.toLowerCase()} style={{ y, scale, opacity, borderLeftColor }}>
       <span>{number}</span><strong>{label}</strong>
       <div className="layerComposition">
         <p>{detail}</p>
@@ -260,8 +271,8 @@ function App() {
                 <p>Start with information. Add structure, views, and behavior. Keep composing until the page becomes the tool.</p>
               </div>
               <div className="layerStack">
-                {layers.map(([number, label, detail, tokens]) => (
-                  <StructureLayer key={number} number={number} label={label} detail={detail} tokens={tokens} reduceMotion={reduceMotion} />
+                {layers.map(([number, label, detail, tokens], index) => (
+                  <StructureLayer key={number} number={number} label={label} detail={detail} tokens={tokens} reduceMotion={reduceMotion} compositionProgress={solutionProgress} assemblyRange={layerAssemblyRanges[index]} />
                 ))}
               </div>
             </div>

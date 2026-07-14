@@ -286,17 +286,18 @@ img { max-width: 100%; display: block; }
 .solutionThesis { display: block; margin-bottom: 22px; color: var(--coral); font: italic 18px/1.2 Georgia, serif; }
 .solutionIntro h2 { font-size: clamp(38px, 4.3vw, 64px); }
 .solutionIntro em { color: var(--coral); font-family: Georgia, serif; font-weight: 400; }
-.layerStack { grid-column: 6 / 13; display: flex; flex-direction: column-reverse; gap: 8px; position: relative; }
+.layerStack { grid-column: 6 / 13; display: flex; flex-direction: column; gap: 8px; position: relative; }
 .layerStack::before { content: ""; position: absolute; z-index: 0; top: 6%; bottom: 6%; left: 0; width: 1px; background: linear-gradient(transparent, var(--coral) 22%, var(--coral) 78%, transparent); opacity: .28; }
 .layer {
   position: relative;
   z-index: 1;
-  min-height: 128px;
+  min-height: 160px;
   display: grid;
-  grid-template-columns: 54px 1fr minmax(160px, .8fr);
+  grid-template-columns: 54px minmax(150px, .85fr) minmax(260px, 1.25fr);
   align-items: center;
-  gap: 20px;
-  padding: 24px 28px;
+  gap: 22px;
+  padding: 26px 28px;
+  overflow: hidden;
   background: var(--coral-pale);
   color: var(--coral);
   border-left: 2px solid transparent;
@@ -307,25 +308,27 @@ img { max-width: 100%; display: block; }
 .layer > span { font-size: 34px; font-weight: 300; }
 .layer strong { font-size: clamp(22px, 2.5vw, 34px); font-weight: 400; }
 .layer p { margin: 0; font-size: 14px; line-height: 1.4; }
-.layerComposition { display: grid; gap: 13px; align-content: center; }
-.layerComposition p { font-size: 13px; }
-.layerTokens { width: min(100%, 246px); display: flex; gap: 2px; padding-top: 5px; }
+.layerComposition { align-self: stretch; display: grid; grid-template-rows: auto 1fr; gap: 14px; align-content: stretch; }
+.layerComposition p { align-self: start; font-size: 14px; }
+.layerTokens { width: 100%; min-height: 58px; align-self: end; display: flex; gap: 3px; padding-top: 8px; }
 .layerTokens i {
   position: relative;
   flex: 1;
   min-width: 0;
-  padding: 7px 4px 6px;
+  display: grid;
+  place-items: center;
+  padding: 14px 8px 12px;
   border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
   background: color-mix(in srgb, var(--white) 48%, transparent);
-  font-size: 8px;
+  font-size: 10px;
   font-style: normal;
   letter-spacing: .02em;
   text-align: center;
   transform-origin: center;
 }
-.layerTokens i::before { content: ""; position: absolute; top: -5px; left: calc(50% - 6px); width: 12px; height: 5px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-bottom: 0; background: var(--coral-pale); }
+.layerTokens i::before { content: ""; position: absolute; top: -7px; left: calc(50% - 8px); width: 16px; height: 7px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-bottom: 0; background: var(--coral-pale); }
 .layer:first-child .layerTokens i::before { background: #f2f2ef; }
-.layerTokens i:not(:last-child)::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 3px); right: -5px; width: 6px; height: 6px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 50%; background: var(--coral-pale); }
+.layerTokens i:not(:last-child)::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 4px); right: -6px; width: 8px; height: 8px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 50%; background: var(--coral-pale); }
 .layer:first-child .layerTokens i:not(:last-child)::after { background: #f2f2ef; }
 .solutionHandoff {
   grid-column: 3 / 11;
@@ -658,12 +661,13 @@ img { max-width: 100%; display: block; }
   .solution { padding-bottom: 0; }
   .solutionIntro .sectionLabel { margin-bottom: 36px; }
   .layerStack { grid-column: 1 / 5; }
-  .layer { min-height: 124px; grid-template-columns: 42px 1fr; padding: 20px; }
+  .layer { min-height: 190px; grid-template-columns: 42px 1fr; padding: 22px 20px; }
   .layer p { grid-column: 2; }
   .layer > span { font-size: 27px; }
   .layer strong { font-size: 22px; }
   .layerComposition { grid-column: 2; width: 100%; }
   .layerComposition p { grid-column: auto; }
+  .layerTokens { min-height: 52px; }
   .solutionHandoff { grid-column: 1 / 5; margin-top: 72px; padding: 36px 0 112px; text-align: left; justify-items: start; }
   .solutionHandoff strong { font-size: clamp(32px, 10vw, 46px); }
   .solutionHandoff > i { left: 50%; height: 78px; }
