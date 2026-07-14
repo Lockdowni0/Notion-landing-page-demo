@@ -131,7 +131,12 @@ img { max-width: 100%; display: block; }
   column-gap: 24px;
 }
 
-.heroGrid { min-height: calc(100svh - var(--header-height) - 56px); align-items: center; }
+.heroGrid {
+  width: min(100%, 1500px);
+  min-height: calc(100svh - var(--header-height) - 56px);
+  align-items: center;
+  column-gap: clamp(28px, 2.2vw, 44px);
+}
 .heroCopy { grid-column: 1 / 7; position: relative; z-index: 2; }
 .heroCopy h1 {
   margin: 0 0 32px;
@@ -157,10 +162,10 @@ img { max-width: 100%; display: block; }
 .textCta:hover span { transform: translateX(5px); }
 
 .stoneStage {
-  grid-column: 7 / 10;
+  grid-column: 8 / 10;
   justify-self: center;
   position: relative;
-  width: min(28vw, 360px);
+  width: min(25vw, 380px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -180,7 +185,7 @@ img { max-width: 100%; display: block; }
 .heroQuote {
   grid-column: 10 / 13;
   align-self: center;
-  margin: 0 0 0 24px;
+  margin: 0 0 0 clamp(76px, 5.2vw, 120px);
   color: var(--ink);
   font: italic clamp(24px, 2.45vw, 40px)/1.42 Georgia, "Times New Roman", serif;
   letter-spacing: .02em;

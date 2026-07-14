@@ -169,9 +169,10 @@ function App() {
   const { scrollYProgress: solutionProgress } = useScroll({ target: solutionRef, offset: ['start 76%', 'end 20%'] })
   const { scrollYProgress: platformProgress } = useScroll({ target: platformRef, offset: ['start 82%', 'end 30%'] })
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.22 })
-  const stoneY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 92])
-  const stoneRotate = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -4])
-  const quoteY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 42])
+  const heroCopyY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -44])
+  const stoneY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 118])
+  const stoneRotate = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -6])
+  const quoteY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -28])
   const problemPathLength = useTransform(problemProgress, [0.08, 0.58], [0, 1])
   const problemPathOpacity = useTransform(problemProgress, [0.05, 0.25, 0.78], [0, 0.58, 0.18])
   const problemSpineScale = useTransform(problemProgress, [0.62, 0.94], [0, 1])
@@ -252,7 +253,7 @@ function App() {
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title" ref={heroRef}>
           <div className="heroGrid">
-            <motion.div className="heroCopy" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}>
+            <motion.div className="heroCopy" style={{ y: heroCopyY }} initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.15 }}>
               <AssembledHeading as="h1" id="hero-title" parts={[{ text: 'Democratize', breakAfter: true }, { text: 'Software.' }]} reduceMotion={reduceMotion} intro />
               <p>A living page that adapts to you—and becomes part of the software you shape.</p>
               <button className="textCta" onClick={() => scrollToId('demo')}>Begin shaping <span>→</span></button>
