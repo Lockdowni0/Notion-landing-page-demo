@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import {
   demoReducer,
   displayProjectName,
@@ -62,6 +62,13 @@ function PersonGlyph() {
 
 function App() {
   const reduceMotion = useReducedMotion()
+  const heroRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll()
+  const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.22 })
+  const stoneY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 92])
+  const stoneRotate = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -4])
+  const quoteY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 42])
   const [state, dispatch] = useReducer(demoReducer, undefined, loadState)
   const [resetOpen, setResetOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -95,12 +102,12 @@ function App() {
 
   return (
     <div className="siteShell" data-shaped={state.previewed}>
+      <motion.div className="scrollProgress" style={{ scaleX: smoothProgress }} aria-hidden="true" />
       <a className="skipLink" href="#main">Skip to content</a>
       <header className="siteHeader">
         <a className="wordmark" href="#top" aria-label="Notion, back to top">notion</a>
         <nav className="desktopNav" aria-label="Primary navigation">
           <a href="#idea">Idea</a>
-          <a href="#demo">Demo</a>
           <a href="#platform">Platform</a>
         </nav>
         <button className="headerCta" onClick={() => scrollToId('demo')}>
@@ -113,7 +120,6 @@ function App() {
           {menuOpen && (
             <motion.nav id="mobile-nav" className="mobileNav" aria-label="Mobile navigation" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
               <a href="#idea" onClick={() => setMenuOpen(false)}>Idea</a>
-              <a href="#demo" onClick={() => setMenuOpen(false)}>Demo</a>
               <a href="#platform" onClick={() => setMenuOpen(false)}>Platform</a>
             </motion.nav>
           )}
@@ -121,7 +127,7 @@ function App() {
       </header>
 
       <main id="main">
-        <section className="hero" id="top" aria-labelledby="hero-title">
+        <section className="hero" id="top" aria-labelledby="hero-title" ref={heroRef}>
           <div className="heroGrid">
             <motion.p className="heroDate" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>March 2013</motion.p>
             <motion.div className="heroCopy" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}>
@@ -129,13 +135,13 @@ function App() {
               <p>A home for your information, your tools, and the software you shape.</p>
               <button className="textCta" onClick={() => scrollToId('demo')}>Begin shaping <span>→</span></button>
             </motion.div>
-            <motion.div className="stoneStage" initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.25 }}>
+            <motion.div className="stoneStage" style={{ y: stoneY, rotate: stoneRotate }} initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.25 }}>
               <span className="stoneGuide stoneGuideOne" />
               <span className="stoneGuide stoneGuideTwo" />
               <img src="/assets/stone-tool.png" alt="A hand-drawn stone tool, representing the beginning of human-made tools." />
               <span className="stoneIndex">01 / TOOL</span>
             </motion.div>
-            <motion.blockquote className="heroQuote" initial={reduceMotion ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.65 }}>
+            <motion.blockquote className="heroQuote" style={{ y: quoteY }} initial={reduceMotion ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.65 }}>
               We shape<br />our tools,<br />and thereafter<br />our tools will<br />shape us.
             </motion.blockquote>
           </div>
@@ -158,9 +164,9 @@ function App() {
                   <p>{plane.detail}</p>
                 </motion.article>
               ))}
-              <svg className="handoffLines" viewBox="0 0 900 240" aria-hidden="true">
-                <path d="M115 120 C250 5 310 235 445 120 S690 10 810 120" />
-              </svg>
+              <motion.svg className="handoffLines" viewBox="0 0 900 240" aria-hidden="true">
+                <motion.path d="M115 120 C250 5 310 235 445 120 S690 10 810 120" initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }} whileInView={{ pathLength: 1, opacity: 0.55 }} viewport={{ once: true, margin: '-20%' }} transition={{ duration: 1.4, ease: 'easeInOut' }} />
+              </motion.svg>
             </div>
             <blockquote className="marsQuote">We can’t go to Mars by sending Word documents around.</blockquote>
             <p className="turnQuestion">What if the tool adapted to you?</p>
@@ -184,9 +190,53 @@ function App() {
           </div>
         </section>
 
+        <section className="platform section" id="platform" aria-labelledby="platform-title">
+          <div className="pageGrid platformGrid">
+            <SectionLabel number="03">{state.previewed ? 'Your structure, at work' : 'Platform'}</SectionLabel>
+            <div className="platformStatement">
+              <h2 id="platform-title">{state.previewed ? `${name} is already shaping the work.` : 'Build once. Serve many.'}</h2>
+              <p>{state.previewed
+                ? state.view === 'board' ? 'The workflow you chose now decides how work moves from one state to the next.' : 'The fields you chose now decide what the team can see, sort, and act on.'
+                : 'One structure can become a project tracker, a client portal, or a team workspace.'}</p>
+            </div>
+            <div className={`platformDiagram ${state.view}`}>
+              <motion.div className="sourceModule" layout>
+                <span>Shared structure</span>
+                <strong>{state.previewed ? name : 'Launch Plan'}</strong>
+                <div className="moduleFields">
+                  {state.view === 'table' ? <><i>Owner</i><i>Status</i><i>Due</i></> : <><i>Not started</i><i>In progress</i><i>Done</i></>}
+                </div>
+              </motion.div>
+              <svg viewBox="0 0 700 170" aria-hidden="true"><path d="M350 0v52M350 52 90 145M350 52v93M350 52l260 93" /></svg>
+              <div className="destinations">
+                {['Your project', 'Client view', 'Team workflow'].map((label) => <div key={label}><PersonGlyph /><span>{label}</span></div>)}
+              </div>
+            </div>
+            <div className="consequenceList">
+              {adaptedConsequences.map((item, index) => <p key={item}><span>0{index + 1}</span>{item}</p>)}
+            </div>
+          </div>
+        </section>
+
+        <section className="finalCta section" aria-labelledby="final-title">
+          <div className="pageGrid finalGrid">
+            <p className="finalEyebrow">{state.previewed ? `You shaped ${name}` : 'Democratize Software'}</p>
+            <h2 id="final-title">{state.previewed ? <>Every structure<br />changes what happens next.</> : <>Shape the tools<br />that will shape you.</>}</h2>
+            <p className="finalSupport">{state.previewed
+              ? state.view === 'board' ? 'The workflow you created now shapes how the work moves.' : 'The fields you created now shape what the work reveals.'
+              : 'Bring the creative power of software to the way you already think and work.'}</p>
+            <div className="finalActions">
+              <button className="textCta" onClick={() => state.previewed ? setResetOpen(true) : scrollToId('demo')}>{state.previewed ? 'Shape another tool' : 'Start building'} <span>→</span></button>
+              {state.previewed && <button className="secondaryText" onClick={() => scrollToId('demo')}>Return to your tool</button>}
+            </div>
+            <blockquote>We shape our tools, and thereafter our tools will shape us.</blockquote>
+            <p className="signature">notion — March 2013</p>
+          </div>
+        </section>
+
         <section className="demoSection section" id="demo" aria-labelledby="demo-title">
           <div className="demoIntro pageGrid">
-            <SectionLabel number="03">Notion Demo</SectionLabel>
+            <SectionLabel number="04">Notion Demo</SectionLabel>
             <div className="sectionStatement">
               <h2 id="demo-title">Start with information.<br />End with software.</h2>
               <p>Shape a project page, give it structure, then see how the structure changes what happens next.</p>
@@ -261,50 +311,6 @@ function App() {
               <i />
               <span className={state.previewed ? 'complete' : ''}>Tool</span>
             </div>
-          </div>
-        </section>
-
-        <section className="platform section" id="platform" aria-labelledby="platform-title">
-          <div className="pageGrid platformGrid">
-            <SectionLabel number="04">{state.previewed ? 'Your structure, at work' : 'Platform'}</SectionLabel>
-            <div className="platformStatement">
-              <h2 id="platform-title">{state.previewed ? `${name} is already shaping the work.` : 'Build once. Serve many.'}</h2>
-              <p>{state.previewed
-                ? state.view === 'board' ? 'The workflow you chose now decides how work moves from one state to the next.' : 'The fields you chose now decide what the team can see, sort, and act on.'
-                : 'One structure can become a project tracker, a client portal, or a team workspace.'}</p>
-            </div>
-            <div className={`platformDiagram ${state.view}`}>
-              <motion.div className="sourceModule" layout>
-                <span>Shared structure</span>
-                <strong>{state.previewed ? name : 'Launch Plan'}</strong>
-                <div className="moduleFields">
-                  {state.view === 'table' ? <><i>Owner</i><i>Status</i><i>Due</i></> : <><i>Not started</i><i>In progress</i><i>Done</i></>}
-                </div>
-              </motion.div>
-              <svg viewBox="0 0 700 170" aria-hidden="true"><path d="M350 0v52M350 52 90 145M350 52v93M350 52l260 93" /></svg>
-              <div className="destinations">
-                {['Your project', 'Client view', 'Team workflow'].map((label) => <div key={label}><PersonGlyph /><span>{label}</span></div>)}
-              </div>
-            </div>
-            <div className="consequenceList">
-              {adaptedConsequences.map((item, index) => <p key={item}><span>0{index + 1}</span>{item}</p>)}
-            </div>
-          </div>
-        </section>
-
-        <section className="finalCta section" aria-labelledby="final-title">
-          <div className="pageGrid finalGrid">
-            <p className="finalEyebrow">{state.previewed ? `You shaped ${name}` : 'Democratize Software'}</p>
-            <h2 id="final-title">{state.previewed ? <>Every structure<br />changes what happens next.</> : <>Shape the tools<br />that will shape you.</>}</h2>
-            <p className="finalSupport">{state.previewed
-              ? state.view === 'board' ? 'The workflow you created now shapes how the work moves.' : 'The fields you created now shape what the work reveals.'
-              : 'Bring the creative power of software to the way you already think and work.'}</p>
-            <div className="finalActions">
-              <button className="textCta" onClick={() => state.previewed ? setResetOpen(true) : scrollToId('demo')}>{state.previewed ? 'Shape another tool' : 'Start building'} <span>→</span></button>
-              {state.previewed && <button className="secondaryText" onClick={() => scrollToId('demo')}>Return to your tool</button>}
-            </div>
-            <blockquote>We shape our tools, and thereafter our tools will shape us.</blockquote>
-            <p className="signature">notion — March 2013</p>
           </div>
         </section>
       </main>
