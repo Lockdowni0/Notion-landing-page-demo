@@ -126,10 +126,6 @@ function AssembledHeading({ as: Tag, id, parts, reduceMotion, intro = false }: {
   )
 }
 
-function PersonGlyph() {
-  return <span className="personGlyph" aria-hidden="true"><i /><b /></span>
-}
-
 function StructureLayer({ number, label, tokens, reduceMotion }: { number: string; label: string; tokens: readonly string[]; reduceMotion: boolean | null }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 94%', 'start 60%'] })
@@ -477,7 +473,7 @@ function App() {
               </motion.div>
               <motion.svg viewBox="0 0 700 170" aria-hidden="true"><motion.path d="M350 0v52M350 52 90 145M350 52v93M350 52l260 93" style={reduceMotion ? undefined : { pathLength: platformBranchLength, opacity: platformBranchOpacity }} initial={reduceMotion ? false : { pathLength: 0 }} animate={reduceMotion ? { pathLength: 1, opacity: 1 } : undefined} /></motion.svg>
               <div className="destinations">
-                {(Object.entries(surfaces) as [SurfaceId, (typeof surfaces)[SurfaceId]][]).map(([id, item], index) => <motion.button type="button" className={surface === id ? 'active' : ''} aria-pressed={surface === id} onClick={() => setSurface(id)} key={id} initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-10%' }} transition={{ duration: 0.45, delay: index * 0.12 }}><PersonGlyph /><span>{item.label}</span><i>Compose →</i></motion.button>)}
+                {(Object.entries(surfaces) as [SurfaceId, (typeof surfaces)[SurfaceId]][]).map(([id, item], index) => <motion.button type="button" className={surface === id ? 'active' : ''} aria-pressed={surface === id} onClick={() => setSurface(id)} key={id} initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-10%' }} transition={{ duration: 0.45, delay: index * 0.12 }}><span>{item.label}</span><i>Compose →</i></motion.button>)}
               </div>
               <AnimatePresence mode="wait">
                 <motion.div className="surfacePreview" key={surface} initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
