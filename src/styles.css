@@ -303,7 +303,6 @@ img { max-width: 100%; display: block; }
   min-width: 0;
   display: grid;
   grid-template-columns: 54px minmax(0, 1fr);
-  grid-template-rows: 1fr auto;
   align-items: center;
   column-gap: 22px;
   padding: 28px;
@@ -316,7 +315,6 @@ img { max-width: 100%; display: block; }
 .layer[data-layer="content"] .layerLead, .layer[data-layer="content"] .layerModules i { background: #f2f2ef; }
 .layerLead > span { font-size: 34px; font-weight: 300; }
 .layerLead strong { font-size: clamp(22px, 2.5vw, 34px); font-weight: 400; }
-.layerLead p { grid-column: 2; margin: 0; font-size: 14px; line-height: 1.4; }
 .layerModules { min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
 .layerModules i {
   position: relative;
@@ -671,10 +669,9 @@ img { max-width: 100%; display: block; }
   .solutionIntro .sectionLabel { margin-bottom: 36px; }
   .layerStack { grid-column: 1 / 5; }
   .layer { min-height: 182px; grid-template-columns: minmax(145px, .9fr) minmax(0, 1.1fr); }
-  .layerLead { grid-template-columns: 30px minmax(0, 1fr); grid-template-rows: 1fr auto; column-gap: 8px; padding: 20px 12px; }
+  .layerLead { grid-template-columns: 30px minmax(0, 1fr); column-gap: 8px; padding: 20px 12px; }
   .layerLead > span { font-size: 25px; }
   .layerLead strong { font-size: 18px; }
-  .layerLead p { font-size: 11px; }
   .layerModules i { padding-inline: 3px; font-size: 8.5px; overflow-wrap: anywhere; }
   .layerModules i:not(:last-child)::after { top: calc(50% - 5px); right: -6px; width: 10px; height: 10px; }
   .solutionHandoff { grid-column: 1 / 5; margin-top: 72px; padding: 36px 0 112px; text-align: left; justify-items: start; }

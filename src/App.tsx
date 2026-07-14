@@ -15,11 +15,11 @@ import {
 const STORAGE_KEY = 'notion-2013-demo:v1'
 
 const layers = [
-  ['0', 'Content', 'Keep information portable.', ['Text', 'Task', 'Asset']],
-  ['1', 'Properties', 'Give information structure.', ['Owner', 'Status', 'Due']],
-  ['2', 'Views', 'Recompose the same data.', ['Table', 'Board', 'Portal']],
-  ['3', 'Behavior', 'Decide how work moves.', ['Filter', 'Permission', 'Workflow']],
-  ['4', 'Publish', 'Save the composition as a recipe.', ['Template', 'Adapt', 'Reuse']],
+  ['0', 'Content', ['Text', 'Task', 'Asset']],
+  ['1', 'Properties', ['Owner', 'Status', 'Due']],
+  ['2', 'Views', ['Table', 'Board', 'Portal']],
+  ['3', 'Behavior', ['Filter', 'Permission', 'Workflow']],
+  ['4', 'Publish', ['Template', 'Adapt', 'Reuse']],
 ] as const
 
 const planes = [
@@ -68,7 +68,7 @@ function PersonGlyph() {
   return <span className="personGlyph" aria-hidden="true"><i /><b /></span>
 }
 
-function StructureLayer({ number, label, detail, tokens, reduceMotion }: { number: string; label: string; detail: string; tokens: readonly string[]; reduceMotion: boolean | null }) {
+function StructureLayer({ number, label, tokens, reduceMotion }: { number: string; label: string; tokens: readonly string[]; reduceMotion: boolean | null }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 94%', 'start 60%'] })
   const y = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 0 : 24, 0])
@@ -91,7 +91,6 @@ function StructureLayer({ number, label, detail, tokens, reduceMotion }: { numbe
       <div className="layerLead">
         <span>{number}</span>
         <strong>{label}</strong>
-        <p>{detail}</p>
       </div>
       <div className="layerModules" aria-label={`${label} primitives`}>
         {tokens.map((token, index) => <motion.i key={token} style={tokenMotion[index]}>{token}</motion.i>)}
@@ -258,8 +257,8 @@ function App() {
                 <p>Start with information. Add structure, views, and behavior. Keep composing until the page becomes the tool.</p>
               </div>
               <div className="layerStack">
-                {layers.map(([number, label, detail, tokens]) => (
-                  <StructureLayer key={number} number={number} label={label} detail={detail} tokens={tokens} reduceMotion={reduceMotion} />
+                {layers.map(([number, label, tokens]) => (
+                  <StructureLayer key={number} number={number} label={label} tokens={tokens} reduceMotion={reduceMotion} />
                 ))}
               </div>
             </div>
