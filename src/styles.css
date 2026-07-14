@@ -576,7 +576,7 @@ img { max-width: 100%; display: block; }
 .surfacePreview > div:last-child { display: flex; justify-content: flex-end; align-items: center; gap: 0; padding-bottom: 4px; }
 .surfacePreview i { color: var(--coral); font-size: 9px; font-style: normal; }
 .surfacePreview i + i { margin-left: 24px; padding-left: 24px; border-left: 1px solid var(--line); }
-.consequenceList { grid-column: 3 / 12; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 72px; }
+.consequenceList { grid-column: 1 / 13; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 72px; }
 .consequenceList p { margin: 0; padding-top: 20px; border-top: 1px solid var(--coral); font: italic 17px/1.45 Georgia, serif; }
 .consequenceList span { display: block; margin-bottom: 32px; color: var(--coral); font: 10px/1 sans-serif; letter-spacing: .16em; }
 
