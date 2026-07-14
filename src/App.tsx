@@ -66,10 +66,31 @@ function StructureLayer({ number, label, detail, reduceMotion }: { number: strin
   const y = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 0 : 34, 0, reduceMotion ? 0 : -8])
   const scale = useTransform(scrollYProgress, [0, 0.42, 1], [reduceMotion ? 1 : 0.965, 1, reduceMotion ? 1 : 0.985])
   const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [reduceMotion ? 1 : 0.32, 1, reduceMotion ? 1 : 0.78])
+  const pieceOneX = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 0 : -38, 0])
+  const pieceOneY = useTransform(scrollYProgress, [0, 0.48], [reduceMotion ? 0 : 18, 0])
+  const pieceTwoX = useTransform(scrollYProgress, [0.08, 0.56], [reduceMotion ? 0 : 34, 0])
+  const pieceTwoY = useTransform(scrollYProgress, [0.08, 0.56], [reduceMotion ? 0 : -17, 0])
+  const pieceThreeX = useTransform(scrollYProgress, [0.16, 0.64], [reduceMotion ? 0 : -24, 0])
+  const pieceThreeY = useTransform(scrollYProgress, [0.16, 0.64], [reduceMotion ? 0 : -20, 0])
+  const pieceFourX = useTransform(scrollYProgress, [0.24, 0.72], [reduceMotion ? 0 : 32, 0])
+  const pieceFourY = useTransform(scrollYProgress, [0.24, 0.72], [reduceMotion ? 0 : 20, 0])
+  const assemblyScale = useTransform(scrollYProgress, [0.28, 0.72, 1], [reduceMotion ? 1 : 0.94, 1, reduceMotion ? 1 : 0.98])
+  const isLego = label === 'LEGO for Software'
 
   return (
-    <motion.div ref={ref} className="layer" style={{ y, scale, opacity }}>
-      <span>{number}</span><strong>{label}</strong><p>{detail}</p>
+    <motion.div ref={ref} className={`layer${isLego ? ' legoLayer' : ''}`} style={{ y, scale, opacity }}>
+      <span>{number}</span><strong>{label}</strong>
+      {isLego ? (
+        <div className="legoLayerCopy">
+          <p>{detail}</p>
+          <motion.div className="legoAssembly" style={{ scale: assemblyScale }} aria-label="Four software modules assembling into one tool">
+            <motion.i style={{ x: pieceOneX, y: pieceOneY }}><b /><b /></motion.i>
+            <motion.i style={{ x: pieceTwoX, y: pieceTwoY }}><b /><b /><b /></motion.i>
+            <motion.i style={{ x: pieceThreeX, y: pieceThreeY }}><b /><b /></motion.i>
+            <motion.i style={{ x: pieceFourX, y: pieceFourY }}><b /><b /><b /></motion.i>
+          </motion.div>
+        </div>
+      ) : <p>{detail}</p>}
     </motion.div>
   )
 }
@@ -194,7 +215,7 @@ function App() {
             </div>
             <div className="planes" aria-label="Information scattered across four applications">
               {planes.map((plane, index) => (
-                <motion.article className={`appPlane ${plane.className}`} key={plane.name} style={planeMotion[index]} initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: '-15%' }} transition={{ duration: 0.55, delay: index * 0.08 }}>
+                <motion.article className={`appPlane ${plane.className}`} key={plane.name} style={planeMotion[index]} initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: false, margin: '-15%' }} transition={{ duration: 0.55, delay: index * 0.08 }}>
                   <span className="planeNumber">0{index + 1}</span>
                   <h3>{plane.name}</h3>
                   <div className="planeLines" aria-hidden="true"><i /><i /><i /></div>
@@ -230,7 +251,7 @@ function App() {
               className="solutionHandoff"
               initial={reduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-12%' }}
+              viewport={{ once: false, margin: '-12%' }}
               transition={{ duration: 0.65 }}
             >
               <motion.div className="pageAssembly" style={reduceMotion ? undefined : { scaleX: pageFrameScaleX, scaleY: pageFrameScaleY, opacity: pageFrameOpacity }} aria-hidden="true"><i /><b /><b /></motion.div>
@@ -251,7 +272,7 @@ function App() {
             </div>
           </div>
 
-          <motion.div className="demoFrame" data-stage={state.inPreview ? 'preview' : state.structured ? 'structured' : 'page'} initial={reduceMotion ? false : { opacity: 0.56, scale: 0.975, y: 28 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true, margin: '-8%' }} transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}>
+          <motion.div className="demoFrame" data-stage={state.inPreview ? 'preview' : state.structured ? 'structured' : 'page'} initial={reduceMotion ? false : { opacity: 0.56, scale: 0.975, y: 28 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: false, margin: '-8%' }} transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}>
             <div className="demoToolbar">
               <span className="demoBrand">notion <em>demo</em></span>
               <div className="demoActions">
@@ -325,7 +346,7 @@ function App() {
             className="demoHandoff"
             initial={reduceMotion ? false : { opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-15%' }}
+            viewport={{ once: false, margin: '-15%' }}
             transition={{ duration: 0.65 }}
             aria-live="polite"
           >
@@ -342,7 +363,7 @@ function App() {
                 <strong>{state.previewed ? 'The page remembers. The product continues.' : 'Shape one tool. Carry its structure forward.'}</strong>
               </motion.div>
             </AnimatePresence>
-            <motion.div className="handoffSeed" layout whileInView={reduceMotion ? undefined : { y: [8, 0], opacity: [0.6, 1] }} viewport={{ once: true }} transition={{ duration: 0.55 }}>
+            <motion.div className="handoffSeed" layout initial={reduceMotion ? false : { y: 8, opacity: 0.6 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: false, margin: '-8%' }} transition={{ duration: 0.55 }}>
               <span>Live structure</span>
               <strong>{state.previewed ? name : 'Your tool'}</strong>
               <div>{state.view === 'table' ? <><i>Owner</i><i>Status</i><i>Due</i></> : <><i>Not started</i><i>In progress</i><i>Done</i></>}</div>
@@ -360,7 +381,7 @@ function App() {
                 : 'One structure can become a project tracker, a client portal, or a team workspace.'}</p>
             </div>
             <div className={`platformDiagram ${state.view}`}>
-              <motion.div className="sourceModule" layout initial={reduceMotion ? false : { opacity: 0.35, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: '-16%' }} transition={{ duration: 0.65 }}>
+              <motion.div className="sourceModule" layout initial={reduceMotion ? false : { opacity: 0.35, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: false, margin: '-16%' }} transition={{ duration: 0.65 }}>
                 <span>Shared structure</span>
                 <strong>{state.previewed ? name : 'Launch Plan'}</strong>
                 <div className="moduleFields">
@@ -369,7 +390,7 @@ function App() {
               </motion.div>
               <motion.svg viewBox="0 0 700 170" aria-hidden="true"><motion.path d="M350 0v52M350 52 90 145M350 52v93M350 52l260 93" style={reduceMotion ? undefined : { pathLength: platformBranchLength, opacity: platformBranchOpacity }} initial={reduceMotion ? false : { pathLength: 0 }} animate={reduceMotion ? { pathLength: 1, opacity: 1 } : undefined} /></motion.svg>
               <div className="destinations">
-                {['Your project', 'Client view', 'Team workflow'].map((label, index) => <motion.div key={label} initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-10%' }} transition={{ duration: 0.45, delay: index * 0.12 }}><PersonGlyph /><span>{label}</span></motion.div>)}
+                {['Your project', 'Client view', 'Team workflow'].map((label, index) => <motion.div key={label} initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-10%' }} transition={{ duration: 0.45, delay: index * 0.12 }}><PersonGlyph /><span>{label}</span></motion.div>)}
               </div>
             </div>
             <div className="consequenceList">
@@ -379,10 +400,10 @@ function App() {
               className="marketplacePath"
               initial={reduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-12%' }}
+              viewport={{ once: false, margin: '-12%' }}
               transition={{ duration: 0.65 }}
             >
-              <span className="marketplaceLine" aria-hidden="true"><motion.i initial={reduceMotion ? false : { scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: 'easeOut' }} /></span>
+              <span className="marketplaceLine" aria-hidden="true"><motion.i initial={reduceMotion ? false : { scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: false }} transition={{ duration: 0.8, ease: 'easeOut' }} /></span>
               <div className="marketplaceCopy">
                 <span>Marketplace / Publish</span>
                 <h3>Publish as a template.</h3>
