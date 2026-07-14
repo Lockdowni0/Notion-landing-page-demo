@@ -295,7 +295,7 @@ function App() {
             <motion.div className="primitiveRelease" initial={reduceMotion ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, margin: '-14%' }}>
               <div><span>What survives the applications</span><strong>Keep the primitives. Lose the silos.</strong></div>
               <div className="primitiveRail">
-                {planes.map((plane, index) => <motion.i key={plane.primitive} initial={reduceMotion ? false : { opacity: 0, x: (index - 1.5) * 34 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false, margin: '-12%' }} transition={{ delay: index * 0.08 }}>{plane.primitive}</motion.i>)}
+                {planes.map((plane, index) => <motion.i key={plane.primitive} initial={reduceMotion ? false : { opacity: 0, x: (index - 1.5) * 18 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false, margin: '-12%' }} transition={{ delay: index * 0.06 }}>{plane.primitive}</motion.i>)}
               </div>
             </motion.div>
             <blockquote className="marsQuote">We can’t go to Mars by sending Word documents around.</blockquote>
