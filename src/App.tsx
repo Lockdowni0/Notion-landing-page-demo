@@ -38,7 +38,31 @@ const surfaces: Record<SurfaceId, { label: string; eyebrow: string; detail: stri
 }
 
 const statusOrder: StatusId[] = ['not-started', 'in-progress', 'done']
-const stoneToolSrc = `${import.meta.env.BASE_URL}assets/stone-tool.png`
+const stoneStages = [
+  `${import.meta.env.BASE_URL}assets/stone-raw.webp`,
+  `${import.meta.env.BASE_URL}assets/stone-struck.webp`,
+  `${import.meta.env.BASE_URL}assets/stone-preform.webp`,
+  `${import.meta.env.BASE_URL}assets/stone-refined.webp`,
+  `${import.meta.env.BASE_URL}assets/stone-finished.webp`,
+] as const
+const stoneStageLabels = ['Material', 'First strike', 'Preform', 'Refine', 'Tool'] as const
+
+function stoneStageForProgress(progress: number, complete: boolean) {
+  if (progress < 0.085) return 0
+  if (progress < 0.31) return 1
+  if (progress < 0.52) return 2
+  if (progress < 0.82) return 3
+  return complete ? 4 : 3
+}
+
+function stoneSceneForProgress(progress: number) {
+  if (progress < 0.09) return 0
+  if (progress < 0.31) return 1
+  if (progress < 0.52) return 2
+  if (progress < 0.78) return 3
+  if (progress < 0.94) return 4
+  return 5
+}
 
 function loadState(): DemoState {
   try {
@@ -164,15 +188,22 @@ function App() {
   const problemRef = useRef<HTMLElement>(null)
   const solutionRef = useRef<HTMLElement>(null)
   const platformRef = useRef<HTMLElement>(null)
+  const [state, dispatch] = useReducer(demoReducer, undefined, loadState)
+  const [stoneJourneyStage, setStoneJourneyStage] = useState(0)
+  const [stoneJourneyScene, setStoneJourneyScene] = useState(0)
   const { scrollYProgress } = useScroll()
+  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+    const stage = stoneStageForProgress(latest, state.previewed)
+    setStoneJourneyStage((current) => current === stage ? current : stage)
+    const scene = stoneSceneForProgress(latest)
+    setStoneJourneyScene((current) => current === scene ? current : scene)
+  })
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const { scrollYProgress: problemProgress } = useScroll({ target: problemRef, offset: ['start 78%', 'end 24%'] })
   const { scrollYProgress: solutionProgress } = useScroll({ target: solutionRef, offset: ['start 76%', 'end 20%'] })
   const { scrollYProgress: platformProgress } = useScroll({ target: platformRef, offset: ['start 82%', 'end 30%'] })
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.22 })
   const heroCopyY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -44])
-  const stoneY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 118])
-  const stoneRotate = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -6])
   const quoteY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : -28])
   const problemPathLength = useTransform(problemProgress, [0.08, 0.58], [0, 1])
   const problemPathOpacity = useTransform(problemProgress, [0.05, 0.25, 0.78], [0, 0.58, 0.18])
@@ -183,18 +214,38 @@ function App() {
   const pageFrameOpacity = useTransform(solutionProgress, [0.53, 0.66, 0.94], [0, 0.72, 0.26])
   const platformBranchLength = useTransform(platformProgress, [0.18, 0.58], [0, 1])
   const platformBranchOpacity = useTransform(platformProgress, [0.12, 0.34], [0.18, 1])
+  const stoneSceneStops = [0, 0.075, 0.09, 0.28, 0.31, 0.49, 0.52, 0.75, 0.78, 0.91, 0.94, 1]
+  const stoneActorX = useTransform(scrollYProgress, stoneSceneStops, reduceMotion
+    ? ['0vw', '0vw', '0vw', '0vw', '0vw', '0vw', '0vw', '0vw', '0vw', '0vw', '0vw', '0vw']
+    : ['13vw', '13vw', '18vw', '18vw', '18vw', '18vw', '21vw', '21vw', '20vw', '20vw', '26vw', '26vw'])
+  const stoneActorY = useTransform(scrollYProgress, stoneSceneStops, reduceMotion
+    ? ['0vh', '0vh', '0vh', '0vh', '0vh', '0vh', '0vh', '0vh', '0vh', '0vh', '0vh', '0vh']
+    : ['2vh', '2vh', '-3vh', '-3vh', '-3vh', '-3vh', '0vh', '0vh', '-10vh', '-10vh', '-3vh', '-3vh'])
+  const stoneActorScale = useTransform(scrollYProgress, stoneSceneStops, reduceMotion
+    ? [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+    : [1, 1, 0.9, 0.9, 0.95, 0.95, 1, 1, 0.8, 0.8, 0.88, 0.88])
+  const stoneActorRotate = useTransform(scrollYProgress, stoneSceneStops, reduceMotion
+    ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    : [0, 0, -2, -2, 1, 1, -1, -1, 2, 2, 0, 0])
+  const stoneActorOpacity = useTransform(scrollYProgress, stoneSceneStops,
+    [1, 1, 0.28, 0.28, 0.22, 0.22, 0.1, 0.1, 0.1, 0.1, 0.36, 0.36])
   const planeMotion = [
     { x: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : -42]), y: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : 28]), rotate: -1.4 },
     { x: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : -14]), y: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : -24]), rotate: 0.7 },
     { x: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : 18]), y: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : 32]), rotate: -0.5 },
     { x: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : 44]), y: useTransform(problemProgress, [0.12, 0.82], [0, reduceMotion ? 0 : -18]), rotate: 1.2 },
   ]
-  const [state, dispatch] = useReducer(demoReducer, undefined, loadState)
   const [resetOpen, setResetOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [surface, setSurface] = useState<SurfaceId>('project')
   const resetCancelRef = useRef<HTMLButtonElement>(null)
   const name = displayProjectName(state.projectName)
+
+  useEffect(() => {
+    const latest = scrollYProgress.get()
+    setStoneJourneyStage(stoneStageForProgress(latest, state.previewed))
+    setStoneJourneyScene(stoneSceneForProgress(latest))
+  }, [scrollYProgress, state.previewed])
 
   useEffect(() => {
     try {
@@ -226,6 +277,36 @@ function App() {
   return (
     <div className="siteShell" data-shaped={state.previewed}>
       <motion.div className="scrollProgress" style={{ scaleX: smoothProgress }} aria-hidden="true" />
+      <motion.figure
+        className="stoneStoryStage"
+        data-complete={state.previewed ? 'true' : 'false'}
+        data-stage={stoneJourneyStage}
+        data-scene={stoneJourneyScene}
+        role="img"
+        aria-label="A hand-drawn stone gradually shaped into a tool as the page progresses."
+      >
+        <motion.div
+          className="stoneActor"
+          style={{ x: stoneActorX, y: stoneActorY, scale: stoneActorScale, rotate: stoneActorRotate, opacity: stoneActorOpacity }}
+        >
+          <span className="stoneActorGuide stoneActorGuideOne" />
+          <span className="stoneActorGuide stoneActorGuideTwo" />
+          {stoneStages.map((src, index) => {
+            return (
+              <motion.img
+                key={src}
+                src={src}
+                alt=""
+                initial={false}
+                animate={{ opacity: index === stoneJourneyStage ? 1 : 0, scale: index === stoneJourneyStage ? 1 : 0.98 }}
+                transition={{ duration: reduceMotion ? 0 : 0.35, ease: 'easeOut' }}
+              />
+            )
+          })}
+          <i className="stoneImpact" />
+          <span className="stoneActorIndex">0{stoneJourneyStage + 1} / {stoneStageLabels[stoneJourneyStage]}</span>
+        </motion.div>
+      </motion.figure>
       <a className="skipLink" href="#main">Skip to content</a>
       <header className="siteHeader">
         <a className="wordmark" href="#top" aria-label="Notion, back to top">notion</a>
@@ -259,12 +340,7 @@ function App() {
               <p>A living page that adapts to you—and becomes part of the software you shape.</p>
               <button className="textCta" onClick={() => scrollToId('demo')}>Begin shaping <span>→</span></button>
             </motion.div>
-            <motion.div className="stoneStage" style={{ y: stoneY, rotate: stoneRotate }} initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.25 }}>
-              <span className="stoneGuide stoneGuideOne" />
-              <span className="stoneGuide stoneGuideTwo" />
-              <img src={stoneToolSrc} alt="A hand-drawn stone tool, representing the beginning of human-made tools." />
-              <span className="stoneIndex">01 / TOOL</span>
-            </motion.div>
+            <div className="stoneStageSlot" aria-hidden="true" />
             <motion.blockquote className="heroQuote" style={{ y: quoteY }} initial={reduceMotion ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.65 }}>
               We shape<br />our tools,<br />and thereafter<br />our tools will<br />shape us.
             </motion.blockquote>
